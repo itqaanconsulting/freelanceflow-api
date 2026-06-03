@@ -31,6 +31,8 @@ Current features:
 - Customer CRUD API
 - Project CRUD API linked to customers
 - Project status model: active, paused, completed
+- Time entry CRUD API linked to projects
+- Time entry workflow: draft, submitted, approved, rejected
 - Request validation
 - Duplicate customer email checks
 - Duplicate project name checks per customer
@@ -113,9 +115,24 @@ curl -X POST http://localhost:8080/api/projects \
   }'
 ```
 
+Create and submit a time entry:
+
+```bash
+curl -X POST http://localhost:8080/api/time-entries \
+  -H "Content-Type: application/json" \
+  -d '{
+    "projectId": "<project-id>",
+    "workDate": "2026-06-03",
+    "hours": 7.50,
+    "description": "Implemented customer and project API workflow"
+  }'
+
+curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/submit
+curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/approve
+```
+
 ## Roadmap
 
-- Time entry workflow: draft, submitted, approved, rejected
 - Invoice generation from approved time entries
 - Audit logging for workflow changes
 - OAuth2/JWT security with Keycloak
