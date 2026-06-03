@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: freelanceflow-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/freelanceflow
+    username: freelanceflow
+    password: freelanceflow
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

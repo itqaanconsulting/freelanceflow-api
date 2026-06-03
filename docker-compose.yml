@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: freelanceflow-postgres
+    environment:
+      POSTGRES_DB: freelanceflow
+      POSTGRES_USER: freelanceflow
+      POSTGRES_PASSWORD: freelanceflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - freelanceflow-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  freelanceflow-postgres-data:
