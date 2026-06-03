@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: freelanceflow
       POSTGRES_PASSWORD: freelanceflow
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - freelanceflow-postgres-data:/var/lib/postgresql/data
 

@@ -2,7 +2,7 @@ spring:
   application:
     name: freelanceflow-api
   datasource:
-    url: jdbc:postgresql://localhost:5432/freelanceflow
+    url: jdbc:postgresql://localhost:5433/freelanceflow
     username: freelanceflow
     password: freelanceflow
   jpa:
