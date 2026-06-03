@@ -29,8 +29,11 @@ Customer -> Project -> Time Entry -> Approval -> Invoice -> Payment Status
 Current features:
 
 - Customer CRUD API
+- Project CRUD API linked to customers
+- Project status model: active, paused, completed
 - Request validation
 - Duplicate customer email checks
+- Duplicate project name checks per customer
 - Consistent API error responses
 - PostgreSQL schema migration with Flyway
 - Swagger UI
@@ -77,6 +80,8 @@ http://localhost:8080/actuator/health
 
 ## Example request
 
+Create a customer:
+
 ```bash
 curl -X POST http://localhost:8080/api/customers \
   -H "Content-Type: application/json" \
@@ -92,9 +97,24 @@ curl -X POST http://localhost:8080/api/customers \
   }'
 ```
 
+Create a project:
+
+```bash
+curl -X POST http://localhost:8080/api/projects \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "<customer-id>",
+    "name": "Backend modernization",
+    "description": "Spring Boot API modernization and integration improvements",
+    "hourlyRate": 95.00,
+    "currency": "EUR",
+    "status": "ACTIVE",
+    "startDate": "2026-06-01"
+  }'
+```
+
 ## Roadmap
 
-- Project management with hourly rates
 - Time entry workflow: draft, submitted, approved, rejected
 - Invoice generation from approved time entries
 - Audit logging for workflow changes
