@@ -1,0 +1,90 @@
+{
+  "realm": "freelanceflow",
+  "enabled": true,
+  "displayName": "FreelanceFlow",
+  "roles": {
+    "realm": [
+      {
+        "name": "FREELANCER",
+        "description": "Can manage customers, projects, time entries and generate invoices"
+      },
+      {
+        "name": "ACCOUNTANT",
+        "description": "Can inspect invoices and mark invoices as paid"
+      },
+      {
+        "name": "ADMIN",
+        "description": "Can access all API endpoints including audit events"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "freelanceflow-api",
+      "name": "FreelanceFlow API",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:8080/swagger-ui/oauth2-redirect.html"
+      ],
+      "webOrigins": [
+        "http://localhost:8080"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "freelancer",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Freelancer",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "freelancer",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "FREELANCER"
+      ]
+    },
+    {
+      "username": "accountant",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Accountant",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "accountant",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ACCOUNTANT"
+      ]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    }
+  ]
+}

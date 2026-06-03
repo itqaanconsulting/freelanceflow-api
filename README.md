@@ -13,8 +13,10 @@ This repository is part of Hani El Amam's freelance Java portfolio. It focuses o
 - PostgreSQL persistence with JPA/Hibernate
 - Flyway database migrations
 - Docker-based local development
+- OAuth2/JWT API security with Keycloak
 - OpenAPI/Swagger API documentation
 - Testable modular package structure
+- PostgreSQL integration testing with Testcontainers
 
 ## What this project demonstrates
 
@@ -43,6 +45,7 @@ Current capabilities:
 - Invoice generation from approved time entries
 - Invoice status model: issued, paid, cancelled
 - Audit logging for time entry and invoice workflow changes
+- OAuth2/JWT security with role-based authorization
 - Request validation
 - Duplicate customer email checks
 - Duplicate project name checks per customer
@@ -59,6 +62,8 @@ Current capabilities:
 - Spring Data JPA
 - Bean Validation
 - PostgreSQL
+- Keycloak
+- Spring Security OAuth2 Resource Server
 - Flyway
 - Docker Compose
 - Maven
@@ -67,13 +72,14 @@ Current capabilities:
 
 ## Run locally
 
-Start PostgreSQL:
+Start PostgreSQL and Keycloak:
 
 ```bash
 docker compose up -d
 ```
 
 The local PostgreSQL container is exposed on host port `5433` to avoid conflicts with existing PostgreSQL installations.
+Keycloak is exposed on `http://localhost:8180`.
 
 Run the API:
 
@@ -85,6 +91,18 @@ Open Swagger UI:
 
 ```text
 http://localhost:8080/swagger-ui.html
+```
+
+Keycloak admin console:
+
+```text
+http://localhost:8180
+```
+
+Admin credentials:
+
+```text
+admin / admin
 ```
 
 Health endpoint:
@@ -100,6 +118,16 @@ The fastest way to explore the API is through Swagger UI:
 ```text
 http://localhost:8080/swagger-ui.html
 ```
+
+Click `Authorize` in Swagger and log in with one of the demo users.
+
+Demo users:
+
+| Username | Password | Role |
+| --- | --- | --- |
+| `freelancer` | `freelancer` | `FREELANCER` |
+| `accountant` | `accountant` | `ACCOUNTANT` |
+| `admin` | `admin` | `ADMIN` |
 
 Use this scenario to demo the complete workflow.
 
@@ -233,6 +261,14 @@ The invoice now has status `PAID`.
 - Invoice generation fails when a project has no approved, uninvoiced time entries.
 - Only `ISSUED` invoices can be marked as paid or cancelled.
 
+## Security rules
+
+- Swagger UI, OpenAPI docs and health/info actuator endpoints are public.
+- Customer, project, time-entry and invoice generation endpoints require `FREELANCER` or `ADMIN`.
+- Invoice payment endpoint requires `ACCOUNTANT` or `ADMIN`.
+- Audit events require `ADMIN`.
+- JWT roles are read from Keycloak `realm_access.roles`.
+
 ## Audit logging
 
 Workflow changes are recorded as audit events and can be inspected through:
@@ -255,14 +291,22 @@ Recorded events include:
 
 ## Continuous integration
 
-GitHub Actions runs the test suite on pushes and pull requests to `main`:
+GitHub Actions runs two test jobs on pushes and pull requests to `main`:
 
 ```bash
 mvn test
+mvn verify -Ppostgres-it
+```
+
+The default test suite uses an in-memory test database for fast feedback. The `postgres-it` profile runs a full workflow against a real PostgreSQL container with Testcontainers.
+
+To run the PostgreSQL integration test locally, make sure Docker is running and execute:
+
+```bash
+mvn verify -Ppostgres-it
 ```
 
 ## Roadmap
 
-- OAuth2/JWT security with Keycloak
 - Integration events for invoice lifecycle changes
 - PDF invoice export

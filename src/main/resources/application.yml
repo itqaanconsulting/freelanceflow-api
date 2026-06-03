@@ -11,6 +11,12 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/freelanceflow
+          jwk-set-uri: http://localhost:8180/realms/freelanceflow/protocol/openid-connect/certs
 
 server:
   port: 8080
@@ -24,3 +30,6 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+  oAuthFlow:
+    authorizationUrl: http://localhost:8180/realms/freelanceflow/protocol/openid-connect/auth
+    tokenUrl: http://localhost:8180/realms/freelanceflow/protocol/openid-connect/token

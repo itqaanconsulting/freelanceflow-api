@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  test:
-    name: Maven test
+  unit-tests:
+    name: Maven tests
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +26,21 @@ jobs:
 
       - name: Run tests
         run: mvn test
+
+  postgres-integration-tests:
+    name: PostgreSQL integration tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Run PostgreSQL Testcontainers tests
+        run: mvn verify -Ppostgres-it
