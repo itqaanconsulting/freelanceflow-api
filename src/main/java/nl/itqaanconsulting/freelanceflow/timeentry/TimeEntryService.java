@@ -1,5 +1,6 @@
 package nl.itqaanconsulting.freelanceflow.timeentry;
 
+import nl.itqaanconsulting.freelanceflow.audit.AuditService;
 import nl.itqaanconsulting.freelanceflow.project.Project;
 import nl.itqaanconsulting.freelanceflow.project.ProjectRepository;
 import nl.itqaanconsulting.freelanceflow.shared.ResourceNotFoundException;
@@ -14,10 +15,12 @@ class TimeEntryService {
 
     private final TimeEntryRepository timeEntryRepository;
     private final ProjectRepository projectRepository;
+    private final AuditService auditService;
 
-    TimeEntryService(TimeEntryRepository timeEntryRepository, ProjectRepository projectRepository) {
+    TimeEntryService(TimeEntryRepository timeEntryRepository, ProjectRepository projectRepository, AuditService auditService) {
         this.timeEntryRepository = timeEntryRepository;
         this.projectRepository = projectRepository;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -42,7 +45,14 @@ class TimeEntryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + request.projectId()));
 
         TimeEntry timeEntry = new TimeEntry(project, request.workDate(), request.hours(), request.description());
-        return TimeEntryResponse.from(timeEntryRepository.save(timeEntry));
+        TimeEntry savedTimeEntry = timeEntryRepository.save(timeEntry);
+        auditService.record(
+                "TIME_ENTRY",
+                savedTimeEntry.getId(),
+                "TIME_ENTRY_CREATED",
+                "Time entry created for project %s".formatted(project.getId())
+        );
+        return TimeEntryResponse.from(savedTimeEntry);
     }
 
     @Transactional
@@ -60,6 +70,7 @@ class TimeEntryService {
     TimeEntryResponse submit(UUID id) {
         TimeEntry timeEntry = findTimeEntry(id);
         timeEntry.submit();
+        auditService.record("TIME_ENTRY", timeEntry.getId(), "TIME_ENTRY_SUBMITTED", "Time entry submitted for approval");
         return TimeEntryResponse.from(timeEntry);
     }
 
@@ -67,6 +78,7 @@ class TimeEntryService {
     TimeEntryResponse approve(UUID id) {
         TimeEntry timeEntry = findTimeEntry(id);
         timeEntry.approve();
+        auditService.record("TIME_ENTRY", timeEntry.getId(), "TIME_ENTRY_APPROVED", "Time entry approved");
         return TimeEntryResponse.from(timeEntry);
     }
 
@@ -74,6 +86,12 @@ class TimeEntryService {
     TimeEntryResponse reject(UUID id, TimeEntryRejectionRequest request) {
         TimeEntry timeEntry = findTimeEntry(id);
         timeEntry.reject(request.reason());
+        auditService.record(
+                "TIME_ENTRY",
+                timeEntry.getId(),
+                "TIME_ENTRY_REJECTED",
+                "Time entry rejected: %s".formatted(request.reason())
+        );
         return TimeEntryResponse.from(timeEntry);
     }
 

@@ -1,5 +1,6 @@
 package nl.itqaanconsulting.freelanceflow.invoice;
 
+import nl.itqaanconsulting.freelanceflow.audit.AuditService;
 import nl.itqaanconsulting.freelanceflow.project.Project;
 import nl.itqaanconsulting.freelanceflow.project.ProjectRepository;
 import nl.itqaanconsulting.freelanceflow.shared.ResourceNotFoundException;
@@ -19,12 +20,14 @@ class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final ProjectRepository projectRepository;
     private final TimeEntryRepository timeEntryRepository;
+    private final AuditService auditService;
 
     InvoiceService(InvoiceRepository invoiceRepository, ProjectRepository projectRepository,
-                   TimeEntryRepository timeEntryRepository) {
+                   TimeEntryRepository timeEntryRepository, AuditService auditService) {
         this.invoiceRepository = invoiceRepository;
         this.projectRepository = projectRepository;
         this.timeEntryRepository = timeEntryRepository;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +76,13 @@ class InvoiceService {
             timeEntry.assignInvoice(invoice);
         });
 
+        auditService.record(
+                "INVOICE",
+                invoice.getId(),
+                "INVOICE_GENERATED",
+                "Invoice %s generated for project %s with %d line(s)"
+                        .formatted(invoice.getInvoiceNumber(), project.getId(), invoice.getLines().size())
+        );
         return InvoiceResponse.from(invoice);
     }
 
@@ -80,6 +90,7 @@ class InvoiceService {
     InvoiceResponse markPaid(UUID id) {
         Invoice invoice = findInvoice(id);
         invoice.markPaid();
+        auditService.record("INVOICE", invoice.getId(), "INVOICE_PAID", "Invoice %s marked as paid".formatted(invoice.getInvoiceNumber()));
         return InvoiceResponse.from(invoice);
     }
 
@@ -87,6 +98,7 @@ class InvoiceService {
     InvoiceResponse cancel(UUID id) {
         Invoice invoice = findInvoice(id);
         invoice.cancel();
+        auditService.record("INVOICE", invoice.getId(), "INVOICE_CANCELLED", "Invoice %s cancelled".formatted(invoice.getInvoiceNumber()));
         return InvoiceResponse.from(invoice);
     }
 

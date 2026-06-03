@@ -42,6 +42,7 @@ Current capabilities:
 - Time entry workflow: draft, submitted, approved, rejected
 - Invoice generation from approved time entries
 - Invoice status model: issued, paid, cancelled
+- Audit logging for time entry and invoice workflow changes
 - Request validation
 - Duplicate customer email checks
 - Duplicate project name checks per customer
@@ -232,6 +233,26 @@ The invoice now has status `PAID`.
 - Invoice generation fails when a project has no approved, uninvoiced time entries.
 - Only `ISSUED` invoices can be marked as paid or cancelled.
 
+## Audit logging
+
+Workflow changes are recorded as audit events and can be inspected through:
+
+```text
+GET /api/audit-events
+GET /api/audit-events?aggregateType=TIME_ENTRY&aggregateId=<time-entry-id>
+GET /api/audit-events?aggregateType=INVOICE&aggregateId=<invoice-id>
+```
+
+Recorded events include:
+
+- `TIME_ENTRY_CREATED`
+- `TIME_ENTRY_SUBMITTED`
+- `TIME_ENTRY_APPROVED`
+- `TIME_ENTRY_REJECTED`
+- `INVOICE_GENERATED`
+- `INVOICE_PAID`
+- `INVOICE_CANCELLED`
+
 ## Continuous integration
 
 GitHub Actions runs the test suite on pushes and pull requests to `main`:
@@ -242,7 +263,6 @@ mvn test
 
 ## Roadmap
 
-- Audit logging for workflow changes
 - OAuth2/JWT security with Keycloak
 - Integration events for invoice lifecycle changes
 - PDF invoice export
