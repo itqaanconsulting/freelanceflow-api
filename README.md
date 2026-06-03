@@ -16,17 +16,24 @@ This repository is part of Hani El Amam's freelance Java portfolio. It focuses o
 - OpenAPI/Swagger API documentation
 - Testable modular package structure
 
-## Current scope
+## What this project demonstrates
 
-Version `0.1` starts with customer management as the foundation for the invoice workflow.
+FreelanceFlow models a realistic freelance administration workflow:
 
-Planned workflow:
+- A customer is registered.
+- A billable project is created for that customer.
+- Work is logged as time entries.
+- Time entries move through an approval workflow.
+- Approved work is converted into an invoice.
+- The invoice can be marked as paid or cancelled.
+
+The main workflow is:
 
 ```text
-Customer -> Project -> Time Entry -> Approval -> Invoice -> Payment Status
+Customer -> Project -> Time Entry -> Approval -> Invoice -> Payment
 ```
 
-Current features:
+Current capabilities:
 
 - Customer CRUD API
 - Project CRUD API linked to customers
@@ -41,6 +48,7 @@ Current features:
 - Consistent API error responses
 - PostgreSQL schema migration with Flyway
 - Swagger UI
+- Maven CI pipeline with GitHub Actions
 
 ## Tech stack
 
@@ -82,9 +90,23 @@ Health endpoint:
 http://localhost:8080/actuator/health
 ```
 
-## Example request
+## Demo scenario
 
-Create a customer:
+The fastest way to explore the API is through Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+Use this scenario to demo the complete workflow.
+
+### 1. Create a customer
+
+Endpoint:
+
+```text
+POST /api/customers
+```
 
 ```bash
 curl -X POST http://localhost:8080/api/customers \
@@ -101,7 +123,15 @@ curl -X POST http://localhost:8080/api/customers \
   }'
 ```
 
-Create a project:
+Copy the returned `id`. This is the `customerId` for the next step.
+
+### 2. Create a project
+
+Endpoint:
+
+```text
+POST /api/projects
+```
 
 ```bash
 curl -X POST http://localhost:8080/api/projects \
@@ -117,7 +147,15 @@ curl -X POST http://localhost:8080/api/projects \
   }'
 ```
 
-Create and submit a time entry:
+Copy the returned `id`. This is the `projectId` for the next step.
+
+### 3. Create a time entry
+
+Endpoint:
+
+```text
+POST /api/time-entries
+```
 
 ```bash
 curl -X POST http://localhost:8080/api/time-entries \
@@ -128,12 +166,33 @@ curl -X POST http://localhost:8080/api/time-entries \
     "hours": 7.50,
     "description": "Implemented customer and project API workflow"
   }'
+```
 
+The time entry starts with status `DRAFT`. Copy the returned `id`.
+
+### 4. Submit and approve the time entry
+
+Endpoints:
+
+```text
+POST /api/time-entries/{id}/submit
+POST /api/time-entries/{id}/approve
+```
+
+```bash
 curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/submit
 curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/approve
 ```
 
-Generate an invoice:
+After approval, the time entry has status `APPROVED` and can be invoiced.
+
+### 5. Generate an invoice
+
+Endpoint:
+
+```text
+POST /api/invoices/generate
+```
 
 ```bash
 curl -X POST http://localhost:8080/api/invoices/generate \
@@ -143,8 +202,40 @@ curl -X POST http://localhost:8080/api/invoices/generate \
     "issueDate": "2026-06-03",
     "dueDate": "2026-06-17"
   }'
+```
 
+The invoice contains one line per approved, uninvoiced time entry. Copy the returned `id`.
+
+### 6. Mark the invoice as paid
+
+Endpoint:
+
+```text
+POST /api/invoices/{id}/mark-paid
+```
+
+```bash
 curl -X POST http://localhost:8080/api/invoices/<invoice-id>/mark-paid
+```
+
+The invoice now has status `PAID`.
+
+## API workflow rules
+
+- Only `DRAFT` time entries can be updated or deleted.
+- Only `DRAFT` time entries can be submitted.
+- Only `SUBMITTED` time entries can be approved or rejected.
+- Only `APPROVED` time entries can be invoiced.
+- A time entry can only be invoiced once.
+- Invoice generation fails when a project has no approved, uninvoiced time entries.
+- Only `ISSUED` invoices can be marked as paid or cancelled.
+
+## Continuous integration
+
+GitHub Actions runs the test suite on pushes and pull requests to `main`:
+
+```bash
+mvn test
 ```
 
 ## Roadmap
@@ -152,4 +243,4 @@ curl -X POST http://localhost:8080/api/invoices/<invoice-id>/mark-paid
 - Audit logging for workflow changes
 - OAuth2/JWT security with Keycloak
 - Integration events for invoice lifecycle changes
-- GitHub Actions CI pipeline
+- PDF invoice export
