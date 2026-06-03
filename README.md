@@ -33,6 +33,8 @@ Current features:
 - Project status model: active, paused, completed
 - Time entry CRUD API linked to projects
 - Time entry workflow: draft, submitted, approved, rejected
+- Invoice generation from approved time entries
+- Invoice status model: issued, paid, cancelled
 - Request validation
 - Duplicate customer email checks
 - Duplicate project name checks per customer
@@ -131,9 +133,22 @@ curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/submit
 curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/approve
 ```
 
+Generate an invoice:
+
+```bash
+curl -X POST http://localhost:8080/api/invoices/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "projectId": "<project-id>",
+    "issueDate": "2026-06-03",
+    "dueDate": "2026-06-17"
+  }'
+
+curl -X POST http://localhost:8080/api/invoices/<invoice-id>/mark-paid
+```
+
 ## Roadmap
 
-- Invoice generation from approved time entries
 - Audit logging for workflow changes
 - OAuth2/JWT security with Keycloak
 - Integration events for invoice lifecycle changes

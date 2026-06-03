@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import nl.itqaanconsulting.freelanceflow.invoice.Invoice;
 import nl.itqaanconsulting.freelanceflow.project.Project;
 
 import java.math.BigDecimal;
@@ -44,6 +45,10 @@ public class TimeEntry {
 
     @Column(length = 500)
     private String rejectionReason;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
 
     @Column(nullable = false)
     private OffsetDateTime createdAt;
@@ -100,6 +105,14 @@ public class TimeEntry {
         this.rejectionReason = reason;
     }
 
+    public void assignInvoice(Invoice invoice) {
+        requireStatus(TimeEntryStatus.APPROVED, "Only approved time entries can be invoiced");
+        if (this.invoice != null) {
+            throw new IllegalArgumentException("Time entry has already been invoiced");
+        }
+        this.invoice = invoice;
+    }
+
     private void requireStatus(TimeEntryStatus expectedStatus, String message) {
         if (status != expectedStatus) {
             throw new IllegalArgumentException(message);
@@ -132,6 +145,10 @@ public class TimeEntry {
 
     public String getRejectionReason() {
         return rejectionReason;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
     }
 
     public OffsetDateTime getCreatedAt() {
