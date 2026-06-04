@@ -12,7 +12,7 @@ const els = {
     username: document.querySelector("#username"),
     password: document.querySelector("#password"),
     loadData: document.querySelector("#loadData"),
-    resetDemo: document.querySelector("#resetDemo"),
+    resetData: document.querySelector("#resetData"),
     loadAudit: document.querySelector("#loadAudit"),
     runDemo: document.querySelector("#runDemo"),
     customerForm: document.querySelector("#customerForm"),
@@ -50,7 +50,7 @@ els.loginForm.addEventListener("submit", async (event) => {
 });
 
 els.loadData.addEventListener("click", loadDashboard);
-els.resetDemo.addEventListener("click", resetDemoData);
+els.resetData.addEventListener("click", resetBaseData);
 els.loadAudit.addEventListener("click", loadAuditEvents);
 els.runDemo.addEventListener("click", runSampleWorkflow);
 els.customerForm.addEventListener("submit", createCustomer);
@@ -80,7 +80,7 @@ async function login() {
     els.token.value = state.token;
     localStorage.setItem("freelanceflow.token", state.token);
     syncAuthState();
-    log("Logged in with Keycloak demo user.");
+    log("Logged in with Keycloak.");
     await loadDashboard();
 }
 
@@ -122,7 +122,7 @@ async function loadAuditEvents() {
     log("Audit events loaded.");
 }
 
-async function resetDemoData() {
+async function resetBaseData() {
     requireToken();
     const response = await fetch("/api/demo/reset", {
         method: "POST",
@@ -130,8 +130,8 @@ async function resetDemoData() {
     });
 
     if (response.status === 403) {
-        log("Reset demo data requires ADMIN role. Login with admin / admin.");
-        throw new Error("Reset demo data requires ADMIN role. Login with admin / admin.");
+        log("Reset requires ADMIN role. Login with admin / admin.");
+        throw new Error("Reset requires ADMIN role. Login with admin / admin.");
     }
 
     if (!response.ok) {
@@ -140,7 +140,7 @@ async function resetDemoData() {
     }
 
     const result = await response.json();
-    log(`Demo data reset: ${result.timeEntries} time entries and ${result.auditEvents} audit events created.`);
+    log(`Base data reset: ${result.timeEntries} time entries and ${result.auditEvents} audit events created.`);
     await loadDashboard();
     await loadAuditEvents();
 }
@@ -154,8 +154,8 @@ async function runSampleWorkflow() {
     const customer = await api("/api/customers", {
         method: "POST",
         body: {
-            companyName: `Demo Client ${stamp}`,
-            contactName: "Portfolio Reviewer",
+            companyName: `Client ${stamp}`,
+            contactName: "Jane Doe",
             email: `reviewer-${Date.now()}@example.com`,
             phone: "+31 20 000 0000",
             vatNumber: "NL000000000B01",
@@ -241,7 +241,7 @@ async function createProject(event) {
         body: {
             customerId: form.get("customerId"),
             name: form.get("name"),
-            description: "Created from the portfolio demo UI.",
+            description: "Created from the web UI.",
             hourlyRate: Number(form.get("hourlyRate")),
             currency: String(form.get("currency")).toUpperCase(),
             status: "ACTIVE",

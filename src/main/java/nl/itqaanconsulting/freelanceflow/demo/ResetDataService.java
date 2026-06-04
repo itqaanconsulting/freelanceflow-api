@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
-class DemoDataService {
+class ResetDataService {
 
     private final JdbcTemplate jdbcTemplate;
     private final CustomerRepository customerRepository;
@@ -29,7 +29,7 @@ class DemoDataService {
     private final InvoiceRepository invoiceRepository;
     private final AuditService auditService;
 
-    DemoDataService(
+    ResetDataService(
             JdbcTemplate jdbcTemplate,
             CustomerRepository customerRepository,
             ProjectRepository projectRepository,
@@ -46,7 +46,7 @@ class DemoDataService {
     }
 
     @Transactional
-    DemoResetResponse reset() {
+    ResetDataResponse reset() {
         clearData();
 
         LocalDate today = LocalDate.now();
@@ -74,13 +74,13 @@ class DemoDataService {
 
         TimeEntry submitted = saveTimeEntry(project, today.minusDays(2), "Implemented secured time tracking workflow.", "TIME_ENTRY_CREATED");
         submitted.submit();
-        auditService.record("TIME_ENTRY", submitted.getId(), "TIME_ENTRY_SUBMITTED", "Demo time entry submitted for approval");
+        auditService.record("TIME_ENTRY", submitted.getId(), "TIME_ENTRY_SUBMITTED", "Time entry submitted for approval");
 
         TimeEntry approved = saveTimeEntry(project, today.minusDays(1), "Implemented invoice generation and PDF export.", "TIME_ENTRY_CREATED");
         approved.submit();
-        auditService.record("TIME_ENTRY", approved.getId(), "TIME_ENTRY_SUBMITTED", "Demo time entry submitted for approval");
+        auditService.record("TIME_ENTRY", approved.getId(), "TIME_ENTRY_SUBMITTED", "Time entry submitted for approval");
         approved.approve();
-        auditService.record("TIME_ENTRY", approved.getId(), "TIME_ENTRY_APPROVED", "Demo time entry approved");
+        auditService.record("TIME_ENTRY", approved.getId(), "TIME_ENTRY_APPROVED", "Time entry approved");
 
         Invoice invoice = invoiceRepository.save(new Invoice(
                 project,
@@ -95,11 +95,11 @@ class DemoDataService {
                 "INVOICE",
                 invoice.getId(),
                 "INVOICE_GENERATED",
-                "Demo invoice %s generated for project %s with 1 line"
+                "Invoice %s generated for project %s with 1 line"
                         .formatted(invoice.getInvoiceNumber(), project.getId())
         );
 
-        return new DemoResetResponse(customer.getId(), project.getId(), invoice.getId(), 3, 7);
+        return new ResetDataResponse(customer.getId(), project.getId(), invoice.getId(), 3, 7);
     }
 
     private TimeEntry saveTimeEntry(Project project, LocalDate workDate, String description, String eventType) {
@@ -109,7 +109,7 @@ class DemoDataService {
                 new BigDecimal("6.50"),
                 description
         ));
-        auditService.record("TIME_ENTRY", timeEntry.getId(), eventType, "Demo time entry created for project %s".formatted(project.getId()));
+        auditService.record("TIME_ENTRY", timeEntry.getId(), eventType, "Time entry created for project %s".formatted(project.getId()));
         return timeEntry;
     }
 

@@ -10,7 +10,7 @@
 <main class="shell">
     <header class="hero">
         <div>
-            <p class="eyebrow">Portfolio demo</p>
+            <p class="eyebrow">Freelance operations</p>
             <h1>FreelanceFlow</h1>
             <p class="intro">Secure time tracking and invoicing workflow for freelance Java developers.</p>
             <ol class="workflow-strip" aria-label="Demo workflow">
@@ -52,10 +52,10 @@
             <textarea id="token" rows="3" placeholder="Paste access token here"></textarea>
         </label>
         <div class="actions">
-            <button id="resetDemo" type="button" class="danger-button">Reset demo data</button>
+            <button id="resetData" type="button" class="danger-button">Reset base data</button>
             <button id="loadData" type="button">Load dashboard</button>
             <button id="loadAudit" type="button" class="secondary">Load audit events</button>
-            <button id="runDemo" type="button" class="secondary">Run sample workflow</button>
+            <button id="runDemo" type="button" class="secondary">Run workflow</button>
         </div>
     </section>
 
@@ -81,7 +81,7 @@
     <details class="manual-entry">
         <summary>
             <span>Manual entry</span>
-            <small>Create extra customers, projects and time entries after loading the demo dataset.</small>
+            <small>Create extra customers, projects and time entries after loading the base dataset.</small>
         </summary>
         <section class="forms-grid">
         <article class="panel compact-panel">
@@ -92,11 +92,11 @@
             <form id="customerForm" class="entity-form">
                 <label>
                     Company
-                    <input name="companyName" required value="Itqaan Demo Client">
+                    <input name="companyName" required value="Itqaan Consulting Client">
                 </label>
                 <label>
                     Contact
-                    <input name="contactName" value="Portfolio Reviewer">
+                    <input name="contactName" value="Jane Doe">
                 </label>
                 <label>
                     Email
@@ -212,7 +212,7 @@
     <section class="panel log-panel">
         <div class="section-title">
             <h2>Activity</h2>
-            <span>API calls from this demo</span>
+            <span>Recent actions</span>
         </div>
         <ol id="activityLog"></ol>
     </section>

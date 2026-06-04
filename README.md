@@ -1,12 +1,12 @@
 # FreelanceFlow API
 
-FreelanceFlow API is a Spring Boot portfolio project for freelance time tracking, approval workflows and invoice generation.
+FreelanceFlow API is a Spring Boot application for freelance time tracking, approval workflows and invoice generation.
 
-It demonstrates how a Java backend can model a realistic business workflow with secured REST APIs, PostgreSQL persistence, Flyway migrations, Keycloak-based JWT authorization, audit logging, PDF invoice export and automated tests.
+The project models a realistic administration flow with secured REST APIs, PostgreSQL persistence, Flyway migrations, Keycloak-based JWT authorization, audit logging, PDF invoice export and automated tests.
 
-## Portfolio Value
+## Project Scope
 
-This project is part of Hani El Amam's freelance Java portfolio. It focuses on backend engineering skills that matter in enterprise and consultancy environments:
+The codebase focuses on backend engineering topics that are common in enterprise and consultancy environments:
 
 - Java 21 and Spring Boot backend development
 - REST API design with validation and consistent errors
@@ -38,25 +38,25 @@ The application supports a complete freelance administration flow:
 - Mark invoices as paid.
 - Inspect audit events for workflow changes.
 
-## Demo UI
+## Web UI
 
-A static portfolio demo UI is served by Spring Boot:
+A static web UI is served by Spring Boot:
 
 ```text
 http://localhost:8080/demo/
 ```
 
-Recommended demo flow:
+Recommended local flow:
 
 1. Login with `admin / admin`.
-2. Click `Reset demo data`.
+2. Click `Reset base data`.
 3. Load the dashboard.
 4. Review the customer, project, time entries and invoice.
 5. Download the invoice PDF.
 6. Load audit events.
 7. Optionally create extra data through `Manual entry`.
 
-The reset creates a stable demo dataset:
+The reset creates a stable base dataset:
 
 - 1 customer: `Acme Consulting`
 - 1 project: `Backend Modernization`
@@ -74,7 +74,7 @@ The reset creates a stable demo dataset:
 - Invoice PDF export
 - Invoice workflow: `ISSUED`, `PAID`, `CANCELLED`
 - Audit logging for time entry and invoice events
-- Admin-only demo data reset
+- Admin-only data reset for local presentation
 - Swagger/OpenAPI documentation
 - Consistent validation and error responses
 
@@ -113,7 +113,7 @@ Run the API:
 mvn spring-boot:run
 ```
 
-Open the demo UI:
+Open the web UI:
 
 ```text
 http://localhost:8080/demo/
@@ -161,7 +161,7 @@ http://localhost:8080/actuator/health
 | Mark invoice paid | `POST /api/invoices/{id}/mark-paid` |
 | Download invoice PDF | `GET /api/invoices/{id}/pdf` |
 | Audit events | `GET /api/audit-events` |
-| Demo reset | `POST /api/demo/reset` |
+| Data reset | `POST /api/demo/reset` |
 
 ## Workflow Rules
 
@@ -216,5 +216,4 @@ mvn verify -Ppostgres-it
 
 ## Notes
 
-This is a portfolio project, not a production SaaS. The demo reset endpoint intentionally recreates local demo data and is restricted to `ADMIN`.
-
+This is not a production SaaS. The reset endpoint intentionally recreates local data and is restricted to `ADMIN`.

@@ -6,16 +6,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/demo")
-class DemoDataController {
+class ResetDataController {
 
-    private final DemoDataService demoDataService;
+    private final ResetDataService resetDataService;
 
-    DemoDataController(DemoDataService demoDataService) {
-        this.demoDataService = demoDataService;
+    ResetDataController(ResetDataService resetDataService) {
+        this.resetDataService = resetDataService;
     }
 
     @PostMapping("/reset")
-    DemoResetResponse reset() {
-        return demoDataService.reset();
+    ResetDataResponse reset() {
+        return resetDataService.reset();
     }
 }

@@ -1,6 +1,6 @@
-# FreelanceFlow Demo Walkthrough
+# FreelanceFlow Local Walkthrough
 
-Use this guide to present the project quickly and consistently.
+Steps for running the application locally and walking through the main workflow.
 
 ## 1. Start Dependencies
 
@@ -25,7 +25,7 @@ Check health:
 http://localhost:8080/actuator/health
 ```
 
-## 3. Open The Demo UI
+## 3. Open The Web UI
 
 ```text
 http://localhost:8080/demo/
@@ -37,15 +37,15 @@ Login:
 admin / admin
 ```
 
-## 4. Reset Demo Data
+## 4. Reset Base Data
 
 Click:
 
 ```text
-Reset demo data
+Reset base data
 ```
 
-Expected result:
+After reset:
 
 - 1 customer
 - 1 project
@@ -53,15 +53,15 @@ Expected result:
 - 1 invoice
 - 7 audit events
 
-## 5. Explain The Workflow
+## 5. Review The Workflow
 
-The demo models this business process:
+The application models this business process:
 
 ```text
 Customer -> Project -> Time Entry -> Approval -> Invoice -> Audit
 ```
 
-Show:
+Use the dashboard to review:
 
 - Customer: `Acme Consulting`
 - Project: `Backend Modernization`
@@ -83,7 +83,7 @@ This calls:
 GET /api/invoices/{id}/pdf
 ```
 
-Explain that the PDF is generated from the persisted invoice and invoice lines.
+The PDF is generated from the persisted invoice and invoice lines.
 
 ## 7. Show Audit Events
 
@@ -93,14 +93,14 @@ Click:
 Load audit events
 ```
 
-Explain that audit events are admin-only and capture workflow changes such as:
+Audit events are admin-only and capture workflow changes such as:
 
 - `TIME_ENTRY_CREATED`
 - `TIME_ENTRY_SUBMITTED`
 - `TIME_ENTRY_APPROVED`
 - `INVOICE_GENERATED`
 
-## 8. Optional Manual Flow
+## 8. Manual Flow
 
 Open:
 
@@ -134,9 +134,8 @@ Run:
 mvn test
 ```
 
-Expected result:
+Expected:
 
 ```text
 BUILD SUCCESS
 ```
-

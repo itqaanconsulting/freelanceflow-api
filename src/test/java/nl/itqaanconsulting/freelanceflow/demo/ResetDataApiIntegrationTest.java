@@ -32,14 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         },
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
 )
-class DemoDataApiIntegrationTest {
+class ResetDataApiIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void resetsDemoDataForPortfolioWalkthrough() throws Exception {
+    void resetsBaseDataForLocalWorkflow() throws Exception {
         mockMvc.perform(post("/api/demo/reset"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.timeEntries").value(3))

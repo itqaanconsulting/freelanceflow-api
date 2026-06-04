@@ -57,7 +57,7 @@ class SecurityAuthorizationTest {
 
     @Test
     @WithMockUser(roles = "FREELANCER")
-    void rejectsFreelancerFromDemoReset() throws Exception {
+    void rejectsFreelancerFromDataReset() throws Exception {
         mockMvc.perform(post("/api/demo/reset"))
                 .andExpect(status().isForbidden());
     }

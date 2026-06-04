@@ -2,7 +2,7 @@ package nl.itqaanconsulting.freelanceflow.demo;
 
 import java.util.UUID;
 
-record DemoResetResponse(
+record ResetDataResponse(
         UUID customerId,
         UUID projectId,
         UUID invoiceId,
