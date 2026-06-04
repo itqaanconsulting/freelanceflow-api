@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FreelanceFlow Demo</title>
+    <link rel="stylesheet" href="/demo/styles.css">
+</head>
+<body>
+<main class="shell">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Portfolio demo</p>
+            <h1>FreelanceFlow</h1>
+            <p class="intro">Invoice and time tracking API for freelance Java developers.</p>
+        </div>
+        <div class="status-card">
+            <span class="status-dot" id="authDot"></span>
+            <div>
+                <strong id="authState">Not authenticated</strong>
+                <span id="authDetail">Login or paste a bearer token to call the API.</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="panel auth-panel">
+        <div>
+            <h2>Demo access</h2>
+            <p>Use the Keycloak demo user or paste an existing access token.</p>
+        </div>
+        <form id="loginForm" class="auth-form">
+            <label>
+                Username
+                <input id="username" autocomplete="username" value="freelancer">
+            </label>
+            <label>
+                Password
+                <input id="password" type="password" autocomplete="current-password" value="freelancer">
+            </label>
+            <button type="submit">Login</button>
+        </form>
+        <label class="token-field">
+            Bearer token
+            <textarea id="token" rows="3" placeholder="Paste access token here"></textarea>
+        </label>
+        <div class="actions">
+            <button id="loadData" type="button">Load dashboard</button>
+            <button id="runDemo" type="button" class="secondary">Run sample workflow</button>
+        </div>
+    </section>
+
+    <section class="metrics" aria-label="Workflow metrics">
+        <article>
+            <span id="customerCount">0</span>
+            <p>Customers</p>
+        </article>
+        <article>
+            <span id="projectCount">0</span>
+            <p>Projects</p>
+        </article>
+        <article>
+            <span id="timeEntryCount">0</span>
+            <p>Time entries</p>
+        </article>
+        <article>
+            <span id="invoiceCount">0</span>
+            <p>Invoices</p>
+        </article>
+    </section>
+
+    <section class="grid">
+        <article class="panel">
+            <div class="section-title">
+                <h2>Customers</h2>
+                <span>/api/customers</span>
+            </div>
+            <div id="customers" class="list empty">No data loaded.</div>
+        </article>
+
+        <article class="panel">
+            <div class="section-title">
+                <h2>Projects</h2>
+                <span>/api/projects</span>
+            </div>
+            <div id="projects" class="list empty">No data loaded.</div>
+        </article>
+
+        <article class="panel wide">
+            <div class="section-title">
+                <h2>Time entries</h2>
+                <span>DRAFT -> SUBMITTED -> APPROVED</span>
+            </div>
+            <div id="timeEntries" class="table empty">No data loaded.</div>
+        </article>
+
+        <article class="panel wide">
+            <div class="section-title">
+                <h2>Invoices</h2>
+                <span>Generate, mark paid, export PDF</span>
+            </div>
+            <div id="invoices" class="table empty">No data loaded.</div>
+        </article>
+    </section>
+
+    <section class="panel log-panel">
+        <div class="section-title">
+            <h2>Activity</h2>
+            <span>API calls from this demo</span>
+        </div>
+        <ol id="activityLog"></ol>
+    </section>
+</main>
+<script src="/demo/app.js"></script>
+</body>
+</html>

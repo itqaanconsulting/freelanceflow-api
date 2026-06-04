@@ -27,6 +27,12 @@ class SecurityAuthorizationTest {
     }
 
     @Test
+    void allowsDemoPageWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/demo/index.html"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @WithMockUser(roles = "FREELANCER")
     void allowsFreelancerToAccessCustomerApi() throws Exception {
         mockMvc.perform(get("/api/customers"))

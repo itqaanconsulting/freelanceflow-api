@@ -37,6 +37,7 @@ Customer -> Project -> Time Entry -> Approval -> Invoice -> Payment
 
 Current capabilities:
 
+- Static portfolio demo UI served by Spring Boot
 - Customer CRUD API
 - Project CRUD API linked to customers
 - Project status model: active, paused, completed
@@ -94,6 +95,12 @@ Open Swagger UI:
 http://localhost:8080/swagger-ui.html
 ```
 
+Open the portfolio demo UI:
+
+```text
+http://localhost:8080/demo/
+```
+
 Keycloak admin console:
 
 ```text
@@ -119,6 +126,14 @@ The fastest way to explore the API is through Swagger UI:
 ```text
 http://localhost:8080/swagger-ui.html
 ```
+
+For a visual demo, open:
+
+```text
+http://localhost:8080/demo/
+```
+
+The demo UI can log in with the Keycloak demo users, load secured API data, run a full customer -> project -> time entry -> invoice workflow and download the generated invoice PDF.
 
 Click `Authorize` in Swagger and log in with one of the demo users.
 
@@ -281,7 +296,7 @@ The response is an `application/pdf` document containing the invoice number, cus
 
 ## Security rules
 
-- Swagger UI, OpenAPI docs and health/info actuator endpoints are public.
+- The static demo UI, Swagger UI, OpenAPI docs and health/info actuator endpoints are public.
 - Customer, project, time-entry and invoice generation endpoints require `FREELANCER` or `ADMIN`.
 - Invoice payment endpoint requires `ACCOUNTANT` or `ADMIN`.
 - Audit events require `ADMIN`.
