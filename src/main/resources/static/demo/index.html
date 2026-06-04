@@ -45,6 +45,7 @@
         </label>
         <div class="actions">
             <button id="loadData" type="button">Load dashboard</button>
+            <button id="loadAudit" type="button" class="secondary">Load audit events</button>
             <button id="runDemo" type="button" class="secondary">Run sample workflow</button>
         </div>
     </section>
@@ -180,6 +181,17 @@
             </div>
             <div id="invoices" class="table empty">No data loaded.</div>
         </article>
+    </section>
+
+    <section class="panel audit-panel">
+        <div class="section-title">
+            <div>
+                <h2>Audit events</h2>
+                <p>Admin-only history of workflow changes.</p>
+            </div>
+            <span>GET /api/audit-events</span>
+        </div>
+        <div id="auditEvents" class="table empty">Login as admin and load audit events.</div>
     </section>
 
     <section class="panel log-panel">

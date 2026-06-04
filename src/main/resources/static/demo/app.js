@@ -12,6 +12,7 @@ const els = {
     username: document.querySelector("#username"),
     password: document.querySelector("#password"),
     loadData: document.querySelector("#loadData"),
+    loadAudit: document.querySelector("#loadAudit"),
     runDemo: document.querySelector("#runDemo"),
     customerForm: document.querySelector("#customerForm"),
     projectForm: document.querySelector("#projectForm"),
@@ -27,6 +28,7 @@ const els = {
     projects: document.querySelector("#projects"),
     timeEntries: document.querySelector("#timeEntries"),
     invoices: document.querySelector("#invoices"),
+    auditEvents: document.querySelector("#auditEvents"),
     activityLog: document.querySelector("#activityLog")
 };
 
@@ -47,6 +49,7 @@ els.loginForm.addEventListener("submit", async (event) => {
 });
 
 els.loadData.addEventListener("click", loadDashboard);
+els.loadAudit.addEventListener("click", loadAuditEvents);
 els.runDemo.addEventListener("click", runSampleWorkflow);
 els.customerForm.addEventListener("submit", createCustomer);
 els.projectForm.addEventListener("submit", createProject);
@@ -94,6 +97,27 @@ async function loadDashboard() {
     state.invoices = invoices;
     render();
     log("Dashboard loaded from secured API endpoints.");
+}
+
+async function loadAuditEvents() {
+    requireToken();
+    const response = await fetch("/api/audit-events", {
+        headers: {"Authorization": `Bearer ${state.token}`}
+    });
+
+    if (response.status === 403) {
+        renderAuditAccessDenied();
+        log("Audit events require ADMIN role. Login with admin / admin.");
+        return;
+    }
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`/api/audit-events failed with HTTP ${response.status}: ${text}`);
+    }
+
+    renderAuditEvents(await response.json());
+    log("Audit events loaded.");
 }
 
 async function runSampleWorkflow() {
@@ -368,6 +392,35 @@ function render() {
     });
 }
 
+function renderAuditAccessDenied() {
+    els.auditEvents.className = "empty";
+    els.auditEvents.innerHTML = `<span class="error">Audit events require ADMIN role. Login with admin / admin and click Load audit events.</span>`;
+}
+
+function renderAuditEvents(events) {
+    els.auditEvents.className = events.length ? "table" : "table empty";
+    els.auditEvents.innerHTML = events.length ? `
+        <table>
+            <thead>
+            <tr><th>Time</th><th>Event</th><th>Aggregate</th><th>Message</th></tr>
+            </thead>
+            <tbody>
+            ${events.map(event => `
+                <tr>
+                    <td>${formatDateTime(event.createdAt)}</td>
+                    <td><span class="badge">${escapeHtml(event.eventType)}</span></td>
+                    <td>
+                        <strong>${escapeHtml(event.aggregateType)}</strong>
+                        <div class="meta mono">${escapeHtml(event.aggregateId)}</div>
+                    </td>
+                    <td>${escapeHtml(event.message)}</td>
+                </tr>
+            `).join("")}
+            </tbody>
+        </table>
+    ` : "No audit events found.";
+}
+
 function renderSelects() {
     const customerOptions = options(state.customers, customer => customer.companyName);
     const projectOptions = options(state.projects, project => `${project.customerName} - ${project.name}`);
@@ -436,6 +489,13 @@ function log(message) {
 
 function money(value, currency) {
     return new Intl.NumberFormat("en-US", {style: "currency", currency: currency || "EUR"}).format(Number(value || 0));
+}
+
+function formatDateTime(value) {
+    return new Intl.DateTimeFormat("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short"
+    }).format(new Date(value));
 }
 
 function escapeHtml(value) {

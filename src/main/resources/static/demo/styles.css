@@ -175,7 +175,7 @@ h2 {
 
 .actions {
     grid-column: 1 / -1;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto auto auto;
     justify-content: end;
 }
 
@@ -335,6 +335,15 @@ th {
 
 .log-panel {
     margin-top: 1rem;
+}
+
+.audit-panel {
+    margin-top: 1rem;
+}
+
+.mono {
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    word-break: break-all;
 }
 
 #activityLog {
