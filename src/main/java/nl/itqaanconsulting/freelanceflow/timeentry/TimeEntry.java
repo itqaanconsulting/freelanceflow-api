@@ -87,13 +87,13 @@ public class TimeEntry {
         this.description = request.description();
     }
 
-    void submit() {
+    public void submit() {
         requireStatus(TimeEntryStatus.DRAFT, "Only draft time entries can be submitted");
         this.status = TimeEntryStatus.SUBMITTED;
         this.rejectionReason = null;
     }
 
-    void approve() {
+    public void approve() {
         requireStatus(TimeEntryStatus.SUBMITTED, "Only submitted time entries can be approved");
         this.status = TimeEntryStatus.APPROVED;
         this.rejectionReason = null;

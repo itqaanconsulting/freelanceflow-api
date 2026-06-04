@@ -87,7 +87,7 @@ public class Invoice {
         updatedAt = OffsetDateTime.now();
     }
 
-    void addLine(InvoiceLine line) {
+    public void addLine(InvoiceLine line) {
         lines.add(line);
         totalAmount = totalAmount.add(line.getLineAmount());
     }

@@ -133,7 +133,9 @@ For a visual demo, open:
 http://localhost:8080/demo/
 ```
 
-The demo UI can log in with the Keycloak demo users, load secured API data, manually create customers, projects and time entries, move time entries through the workflow, generate invoices, download the generated invoice PDF and inspect admin-only audit events.
+The demo UI can log in with the Keycloak demo users, reset a stable demo dataset, load secured API data, manually create customers, projects and time entries, move time entries through the workflow, generate invoices, download the generated invoice PDF and inspect admin-only audit events.
+
+Login with `admin / admin` and click `Reset demo data` to recreate a clean portfolio walkthrough with one customer, one project, three time entries, one issued invoice and audit history.
 
 Click `Authorize` in Swagger and log in with one of the demo users.
 

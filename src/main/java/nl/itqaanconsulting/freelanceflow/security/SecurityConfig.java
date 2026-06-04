@@ -40,6 +40,7 @@ class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        .requestMatchers("/api/demo/**").hasRole("ADMIN")
                         .requestMatchers("/api/audit-events/**").hasRole("ADMIN")
                         .requestMatchers("/api/invoices/*/mark-paid").hasAnyRole("ACCOUNTANT", "ADMIN")
                         .requestMatchers("/api/invoices/**").hasAnyRole("FREELANCER", "ACCOUNTANT", "ADMIN")

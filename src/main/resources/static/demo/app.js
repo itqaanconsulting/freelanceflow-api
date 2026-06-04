@@ -12,6 +12,7 @@ const els = {
     username: document.querySelector("#username"),
     password: document.querySelector("#password"),
     loadData: document.querySelector("#loadData"),
+    resetDemo: document.querySelector("#resetDemo"),
     loadAudit: document.querySelector("#loadAudit"),
     runDemo: document.querySelector("#runDemo"),
     customerForm: document.querySelector("#customerForm"),
@@ -49,6 +50,7 @@ els.loginForm.addEventListener("submit", async (event) => {
 });
 
 els.loadData.addEventListener("click", loadDashboard);
+els.resetDemo.addEventListener("click", resetDemoData);
 els.loadAudit.addEventListener("click", loadAuditEvents);
 els.runDemo.addEventListener("click", runSampleWorkflow);
 els.customerForm.addEventListener("submit", createCustomer);
@@ -118,6 +120,29 @@ async function loadAuditEvents() {
 
     renderAuditEvents(await response.json());
     log("Audit events loaded.");
+}
+
+async function resetDemoData() {
+    requireToken();
+    const response = await fetch("/api/demo/reset", {
+        method: "POST",
+        headers: {"Authorization": `Bearer ${state.token}`}
+    });
+
+    if (response.status === 403) {
+        log("Reset demo data requires ADMIN role. Login with admin / admin.");
+        throw new Error("Reset demo data requires ADMIN role. Login with admin / admin.");
+    }
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`/api/demo/reset failed with HTTP ${response.status}: ${text}`);
+    }
+
+    const result = await response.json();
+    log(`Demo data reset: ${result.timeEntries} time entries and ${result.auditEvents} audit events created.`);
+    await loadDashboard();
+    await loadAuditEvents();
 }
 
 async function runSampleWorkflow() {
@@ -408,7 +433,7 @@ function renderAuditEvents(events) {
             ${events.map(event => `
                 <tr>
                     <td>${formatDateTime(event.createdAt)}</td>
-                    <td><span class="badge">${escapeHtml(event.eventType)}</span></td>
+                    <td><span class="badge ${event.eventType.toLowerCase()}">${escapeHtml(event.eventType)}</span></td>
                     <td>
                         <strong>${escapeHtml(event.aggregateType)}</strong>
                         <div class="meta mono">${escapeHtml(event.aggregateId)}</div>

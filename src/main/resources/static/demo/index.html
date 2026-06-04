@@ -8,11 +8,19 @@
 </head>
 <body>
 <main class="shell">
-    <header class="page-header">
+    <header class="hero">
         <div>
             <p class="eyebrow">Portfolio demo</p>
             <h1>FreelanceFlow</h1>
-            <p class="intro">Invoice and time tracking API for freelance Java developers.</p>
+            <p class="intro">Secure time tracking and invoicing workflow for freelance Java developers.</p>
+            <ol class="workflow-strip" aria-label="Demo workflow">
+                <li>Customer</li>
+                <li>Project</li>
+                <li>Time entry</li>
+                <li>Approval</li>
+                <li>Invoice</li>
+                <li>Audit</li>
+            </ol>
         </div>
         <div class="status-card">
             <span class="status-dot" id="authDot"></span>
@@ -26,16 +34,16 @@
     <section class="panel auth-panel">
         <div>
             <h2>Demo access</h2>
-            <p>Use the Keycloak demo user or paste an existing access token.</p>
+            <p>Use admin / admin for reset and audit, or freelancer / freelancer for the core workflow.</p>
         </div>
         <form id="loginForm" class="auth-form">
             <label>
                 Username
-                <input id="username" autocomplete="username" value="freelancer">
+                <input id="username" autocomplete="username" value="admin">
             </label>
             <label>
                 Password
-                <input id="password" type="password" autocomplete="current-password" value="freelancer">
+                <input id="password" type="password" autocomplete="current-password" value="admin">
             </label>
             <button type="submit">Login</button>
         </form>
@@ -44,6 +52,7 @@
             <textarea id="token" rows="3" placeholder="Paste access token here"></textarea>
         </label>
         <div class="actions">
+            <button id="resetDemo" type="button" class="danger-button">Reset demo data</button>
             <button id="loadData" type="button">Load dashboard</button>
             <button id="loadAudit" type="button" class="secondary">Load audit events</button>
             <button id="runDemo" type="button" class="secondary">Run sample workflow</button>
@@ -69,8 +78,13 @@
         </article>
     </section>
 
-    <section class="forms-grid">
-        <article class="panel">
+    <details class="manual-entry">
+        <summary>
+            <span>Manual entry</span>
+            <small>Create extra customers, projects and time entries after loading the demo dataset.</small>
+        </summary>
+        <section class="forms-grid">
+        <article class="panel compact-panel">
             <div class="section-title">
                 <h2>Create customer</h2>
                 <span>POST /api/customers</span>
@@ -96,7 +110,7 @@
             </form>
         </article>
 
-        <article class="panel">
+        <article class="panel compact-panel">
             <div class="section-title">
                 <h2>Create project</h2>
                 <span>POST /api/projects</span>
@@ -122,7 +136,7 @@
             </form>
         </article>
 
-        <article class="panel">
+        <article class="panel compact-panel">
             <div class="section-title">
                 <h2>Log time</h2>
                 <span>POST /api/time-entries</span>
@@ -147,7 +161,8 @@
                 <button type="submit">Create time entry</button>
             </form>
         </article>
-    </section>
+        </section>
+    </details>
 
     <section class="grid">
         <article class="panel">
