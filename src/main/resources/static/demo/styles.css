@@ -230,6 +230,62 @@ h2 {
     margin-bottom: 1rem;
 }
 
+.notifications {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.notice {
+    align-items: flex-start;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--info);
+    border-radius: 8px;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+}
+
+.notice p {
+    color: var(--muted);
+    margin: 0.2rem 0 0;
+}
+
+.notice button {
+    background: transparent;
+    color: var(--muted);
+    padding: 0;
+}
+
+.notice.success {
+    background: #ecfdf3;
+    border-color: #bbf7d0;
+    border-left-color: var(--accent);
+}
+
+.notice.error {
+    background: #fff1f1;
+    border-color: #fecdca;
+    border-left-color: var(--danger);
+}
+
+.notice.warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    border-left-color: var(--warning);
+}
+
+.notice.info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    border-left-color: var(--info);
+}
+
+.inline-notice {
+    margin-top: 0.75rem;
+}
+
 .forms-grid {
     display: grid;
     gap: 1rem;

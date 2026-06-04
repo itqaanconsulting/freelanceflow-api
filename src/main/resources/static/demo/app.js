@@ -6,6 +6,8 @@ const state = {
     invoices: []
 };
 
+let activeNoticeTarget = null;
+
 const els = {
     token: document.querySelector("#token"),
     loginForm: document.querySelector("#loginForm"),
@@ -30,6 +32,7 @@ const els = {
     timeEntries: document.querySelector("#timeEntries"),
     invoices: document.querySelector("#invoices"),
     auditEvents: document.querySelector("#auditEvents"),
+    notifications: document.querySelector("#notifications"),
     activityLog: document.querySelector("#activityLog")
 };
 
@@ -44,20 +47,17 @@ els.token.addEventListener("input", () => {
     syncAuthState();
 });
 
-els.loginForm.addEventListener("submit", async (event) => {
+els.loginForm.addEventListener("submit", event => runAction(() => login(event), event.currentTarget));
+els.loadData.addEventListener("click", event => runAction(loadDashboard, event.currentTarget));
+els.resetData.addEventListener("click", event => runAction(resetBaseData, event.currentTarget));
+els.loadAudit.addEventListener("click", event => runAction(loadAuditEvents, event.currentTarget));
+els.runDemo.addEventListener("click", event => runAction(runSampleWorkflow, event.currentTarget));
+els.customerForm.addEventListener("submit", event => runAction(() => createCustomer(event), event.currentTarget));
+els.projectForm.addEventListener("submit", event => runAction(() => createProject(event), event.currentTarget));
+els.timeEntryForm.addEventListener("submit", event => runAction(() => createTimeEntry(event), event.currentTarget));
+
+async function login(event) {
     event.preventDefault();
-    await login();
-});
-
-els.loadData.addEventListener("click", loadDashboard);
-els.resetData.addEventListener("click", resetBaseData);
-els.loadAudit.addEventListener("click", loadAuditEvents);
-els.runDemo.addEventListener("click", runSampleWorkflow);
-els.customerForm.addEventListener("submit", createCustomer);
-els.projectForm.addEventListener("submit", createProject);
-els.timeEntryForm.addEventListener("submit", createTimeEntry);
-
-async function login() {
     const body = new URLSearchParams({
         grant_type: "password",
         client_id: "freelanceflow-api",
@@ -81,6 +81,7 @@ async function login() {
     localStorage.setItem("freelanceflow.token", state.token);
     syncAuthState();
     log("Logged in with Keycloak.");
+    notify("success", "Login successful", `Authenticated as ${els.username.value.trim()}.`);
     await loadDashboard();
 }
 
@@ -99,6 +100,7 @@ async function loadDashboard() {
     state.invoices = invoices;
     render();
     log("Dashboard loaded from secured API endpoints.");
+    notify("success", "Dashboard loaded", "Latest customers, projects, time entries and invoices are visible.");
 }
 
 async function loadAuditEvents() {
@@ -110,16 +112,17 @@ async function loadAuditEvents() {
     if (response.status === 403) {
         renderAuditAccessDenied();
         log("Audit events require ADMIN role. Login with admin / admin.");
+        notify("warning", "Admin required", "Audit events are only available for admin / admin.");
         return;
     }
 
     if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`/api/audit-events failed with HTTP ${response.status}: ${text}`);
+        throw await apiError("/api/audit-events", response);
     }
 
     renderAuditEvents(await response.json());
     log("Audit events loaded.");
+    notify("success", "Audit loaded", "Audit history is updated.");
 }
 
 async function resetBaseData() {
@@ -135,12 +138,12 @@ async function resetBaseData() {
     }
 
     if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`/api/demo/reset failed with HTTP ${response.status}: ${text}`);
+        throw await apiError("/api/demo/reset", response);
     }
 
     const result = await response.json();
     log(`Base data reset: ${result.timeEntries} time entries and ${result.auditEvents} audit events created.`);
+    notify("success", "Base data reset", `${result.timeEntries} time entries and ${result.auditEvents} audit events created.`);
     await loadDashboard();
     await loadAuditEvents();
 }
@@ -209,6 +212,7 @@ async function runSampleWorkflow() {
     log(`Generated invoice ${invoice.invoiceNumber}.`);
 
     await loadDashboard();
+    notify("success", "Workflow finished", `Invoice ${invoice.invoiceNumber} was generated from a new customer, project and time entry.`);
 }
 
 async function createCustomer(event) {
@@ -229,6 +233,7 @@ async function createCustomer(event) {
         }
     });
     log(`Created customer ${customer.companyName}.`);
+    notify("success", "Customer created", `${customer.companyName} is available in the dashboard.`);
     await loadDashboard();
 }
 
@@ -250,6 +255,7 @@ async function createProject(event) {
         }
     });
     log(`Created project ${project.name}.`);
+    notify("success", "Project created", `${project.name} is linked to the selected customer.`);
     await loadDashboard();
 }
 
@@ -267,18 +273,21 @@ async function createTimeEntry(event) {
         }
     });
     log(`Created draft time entry for ${entry.projectName}.`);
+    notify("success", "Time entry created", `${entry.hours} hours logged for ${entry.projectName}.`);
     await loadDashboard();
 }
 
 async function submitTimeEntry(id) {
     const entry = await api(`/api/time-entries/${id}/submit`, {method: "POST"});
     log(`Submitted time entry for ${entry.projectName}.`);
+    notify("success", "Time entry submitted", `${entry.projectName} is ready for approval.`);
     await loadDashboard();
 }
 
 async function approveTimeEntry(id) {
     const entry = await api(`/api/time-entries/${id}/approve`, {method: "POST"});
     log(`Approved time entry for ${entry.projectName}.`);
+    notify("success", "Time entry approved", `${entry.projectName} can now be invoiced.`);
     await loadDashboard();
 }
 
@@ -290,12 +299,14 @@ async function generateInvoice(projectId) {
         body: {projectId, issueDate: today, dueDate}
     });
     log(`Generated invoice ${invoice.invoiceNumber}.`);
+    notify("success", "Invoice generated", `${invoice.invoiceNumber} is visible in the invoice list.`);
     await loadDashboard();
 }
 
 async function markInvoicePaid(id) {
     const invoice = await api(`/api/invoices/${id}/mark-paid`, {method: "POST"});
     log(`Marked invoice ${invoice.invoiceNumber} as paid.`);
+    notify("success", "Invoice paid", `${invoice.invoiceNumber} has status PAID.`);
     await loadDashboard();
 }
 
@@ -310,8 +321,7 @@ async function api(path, options = {}) {
     });
 
     if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`${path} failed with HTTP ${response.status}: ${text}`);
+        throw await apiError(path, response);
     }
 
     if (response.status === 204) {
@@ -401,19 +411,19 @@ function render() {
     ` : "No invoices found.";
 
     document.querySelectorAll("[data-pdf]").forEach(button => {
-        button.addEventListener("click", () => downloadPdf(button.dataset.pdf));
+        button.addEventListener("click", event => runAction(() => downloadPdf(button.dataset.pdf), event.currentTarget));
     });
     document.querySelectorAll("[data-submit-entry]").forEach(button => {
-        button.addEventListener("click", () => submitTimeEntry(button.dataset.submitEntry));
+        button.addEventListener("click", event => runAction(() => submitTimeEntry(button.dataset.submitEntry), event.currentTarget));
     });
     document.querySelectorAll("[data-approve-entry]").forEach(button => {
-        button.addEventListener("click", () => approveTimeEntry(button.dataset.approveEntry));
+        button.addEventListener("click", event => runAction(() => approveTimeEntry(button.dataset.approveEntry), event.currentTarget));
     });
     document.querySelectorAll("[data-generate-invoice]").forEach(button => {
-        button.addEventListener("click", () => generateInvoice(button.dataset.generateInvoice));
+        button.addEventListener("click", event => runAction(() => generateInvoice(button.dataset.generateInvoice), event.currentTarget));
     });
     document.querySelectorAll("[data-mark-paid]").forEach(button => {
-        button.addEventListener("click", () => markInvoicePaid(button.dataset.markPaid));
+        button.addEventListener("click", event => runAction(() => markInvoicePaid(button.dataset.markPaid), event.currentTarget));
     });
 }
 
@@ -491,6 +501,7 @@ async function downloadPdf(invoiceId) {
     link.click();
     URL.revokeObjectURL(url);
     log(`Downloaded PDF for invoice ${invoiceId}.`);
+    notify("success", "PDF downloaded", `Invoice ${invoiceId} PDF download started.`);
 }
 
 function requireToken() {
@@ -510,6 +521,102 @@ function log(message) {
     const item = document.createElement("li");
     item.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
     els.activityLog.prepend(item);
+}
+
+function runAction(action, target = null) {
+    const previousTarget = activeNoticeTarget;
+    activeNoticeTarget = target;
+    Promise.resolve()
+        .then(action)
+        .catch(showError)
+        .finally(() => {
+            activeNoticeTarget = previousTarget;
+        });
+}
+
+async function apiError(path, response) {
+    const payload = await readErrorPayload(response);
+    const message = errorMessage(payload) || `${path} failed with HTTP ${response.status}`;
+    const error = new Error(message);
+    error.status = response.status;
+    error.path = path;
+    return error;
+}
+
+async function readErrorPayload(response) {
+    const text = await response.text();
+    if (!text) {
+        return null;
+    }
+    try {
+        return JSON.parse(text);
+    } catch {
+        return text;
+    }
+}
+
+function errorMessage(payload) {
+    if (!payload) {
+        return "";
+    }
+    if (typeof payload === "string") {
+        return payload;
+    }
+    if (payload.validationErrors && Object.keys(payload.validationErrors).length) {
+        return Object.entries(payload.validationErrors)
+            .map(([field, message]) => `${field}: ${message}`)
+            .join("; ");
+    }
+    return payload.message || payload.error || "";
+}
+
+function showError(error) {
+    const message = error?.message || String(error);
+    log(message);
+    notify("error", "Action failed", message);
+    els.authDetail.innerHTML = `<span class="error">${escapeHtml(message)}</span>`;
+}
+
+function notify(type, title, message) {
+    const item = document.createElement("article");
+    item.className = `notice ${type}`;
+    item.innerHTML = `
+        <div>
+            <strong>${escapeHtml(title)}</strong>
+            <p>${escapeHtml(message)}</p>
+        </div>
+        <button type="button" aria-label="Dismiss notification">Close</button>
+    `;
+    item.querySelector("button").addEventListener("click", () => item.remove());
+    const localTarget = noticeTarget(activeNoticeTarget);
+    if (localTarget) {
+        item.classList.add("inline-notice");
+        localTarget.parentNode.insertBefore(item, localTarget.nextSibling);
+    } else {
+        els.notifications.prepend(item);
+    }
+
+    trimNotices(localTarget ? localTarget.parentNode : els.notifications);
+
+    if (type !== "error") {
+        window.setTimeout(() => item.remove(), 6000);
+    }
+}
+
+function noticeTarget(target) {
+    if (!target || !target.isConnected) {
+        return null;
+    }
+    return target.closest("form")
+        || target.closest(".actions")
+        || target.closest("td")
+        || target.closest(".item")
+        || null;
+}
+
+function trimNotices(container) {
+    const notices = Array.from(container.querySelectorAll(":scope > .notice"));
+    notices.slice(4).forEach(notice => notice.remove());
 }
 
 function money(value, currency) {
@@ -533,12 +640,9 @@ function escapeHtml(value) {
 }
 
 window.addEventListener("error", event => {
-    log(event.message);
-    els.authDetail.innerHTML = `<span class="error">${escapeHtml(event.message)}</span>`;
+    showError(event.error || new Error(event.message));
 });
 
 window.addEventListener("unhandledrejection", event => {
-    const message = event.reason?.message || String(event.reason);
-    log(message);
-    els.authDetail.innerHTML = `<span class="error">${escapeHtml(message)}</span>`;
+    showError(event.reason);
 });
