@@ -43,6 +43,7 @@ Current capabilities:
 - Time entry CRUD API linked to projects
 - Time entry workflow: draft, submitted, approved, rejected
 - Invoice generation from approved time entries
+- PDF export for generated invoices
 - Invoice status model: issued, paid, cancelled
 - Audit logging for time entry and invoice workflow changes
 - OAuth2/JWT security with role-based authorization
@@ -251,6 +252,22 @@ curl -X POST http://localhost:8080/api/invoices/<invoice-id>/mark-paid
 
 The invoice now has status `PAID`.
 
+### 7. Download the invoice PDF
+
+Endpoint:
+
+```text
+GET /api/invoices/{id}/pdf
+```
+
+```bash
+curl -L http://localhost:8080/api/invoices/<invoice-id>/pdf \
+  -H "Authorization: Bearer <access-token>" \
+  -o invoice.pdf
+```
+
+The response is an `application/pdf` document containing the invoice number, customer, project, line items and total.
+
 ## API workflow rules
 
 - Only `DRAFT` time entries can be updated or deleted.
@@ -260,6 +277,7 @@ The invoice now has status `PAID`.
 - A time entry can only be invoiced once.
 - Invoice generation fails when a project has no approved, uninvoiced time entries.
 - Only `ISSUED` invoices can be marked as paid or cancelled.
+- Invoice PDFs can be downloaded after invoice generation.
 
 ## Security rules
 
@@ -309,4 +327,4 @@ mvn verify -Ppostgres-it
 ## Roadmap
 
 - Integration events for invoice lifecycle changes
-- PDF invoice export
+- Frontend demo application

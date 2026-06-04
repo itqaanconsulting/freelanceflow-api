@@ -12,8 +12,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,6 +62,16 @@ class InvoiceApiIntegrationTest {
                 .getContentAsString();
 
         UUID invoiceId = UUID.fromString(objectMapper.readTree(response).get("id").asText());
+
+        byte[] pdf = mockMvc.perform(get("/api/invoices/{id}/pdf", invoiceId))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/pdf"))
+                .andExpect(header().string("Content-Disposition", startsWith("attachment; filename=\"INV-2026-0001.pdf\"")))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+
+        assertThat(pdf).startsWith("%PDF".getBytes());
 
         mockMvc.perform(post("/api/invoices/{id}/mark-paid", invoiceId))
                 .andExpect(status().isOk())
