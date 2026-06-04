@@ -23,6 +23,7 @@ body {
 
 button,
 input,
+select,
 textarea {
     font: inherit;
 }
@@ -53,6 +54,7 @@ button.link {
 }
 
 input,
+select,
 textarea {
     width: 100%;
     border: 1px solid var(--line);
@@ -184,6 +186,24 @@ h2 {
     margin-bottom: 1rem;
 }
 
+.forms-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 1rem;
+}
+
+.entity-form {
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.entity-form .full,
+.entity-form button {
+    grid-column: 1 / -1;
+}
+
 .metrics article {
     padding: 1rem;
 }
@@ -241,6 +261,18 @@ h2 {
 
 .item strong {
     display: block;
+}
+
+.row-actions,
+.table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 0.65rem;
+}
+
+.table-actions {
+    margin-top: 0;
 }
 
 .meta {
@@ -334,6 +366,8 @@ th {
 
     .auth-form,
     .metrics,
+    .forms-grid,
+    .entity-form,
     .grid {
         grid-template-columns: 1fr;
     }

@@ -133,7 +133,7 @@ For a visual demo, open:
 http://localhost:8080/demo/
 ```
 
-The demo UI can log in with the Keycloak demo users, load secured API data, run a full customer -> project -> time entry -> invoice workflow and download the generated invoice PDF.
+The demo UI can log in with the Keycloak demo users, load secured API data, manually create customers, projects and time entries, move time entries through the workflow, generate invoices and download the generated invoice PDF.
 
 Click `Authorize` in Swagger and log in with one of the demo users.
 

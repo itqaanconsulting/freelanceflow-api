@@ -68,6 +68,86 @@
         </article>
     </section>
 
+    <section class="forms-grid">
+        <article class="panel">
+            <div class="section-title">
+                <h2>Create customer</h2>
+                <span>POST /api/customers</span>
+            </div>
+            <form id="customerForm" class="entity-form">
+                <label>
+                    Company
+                    <input name="companyName" required value="Itqaan Demo Client">
+                </label>
+                <label>
+                    Contact
+                    <input name="contactName" value="Portfolio Reviewer">
+                </label>
+                <label>
+                    Email
+                    <input name="email" type="email" required value="reviewer@example.com">
+                </label>
+                <label>
+                    City
+                    <input name="city" value="Amsterdam">
+                </label>
+                <button type="submit">Create customer</button>
+            </form>
+        </article>
+
+        <article class="panel">
+            <div class="section-title">
+                <h2>Create project</h2>
+                <span>POST /api/projects</span>
+            </div>
+            <form id="projectForm" class="entity-form">
+                <label>
+                    Customer
+                    <select name="customerId" required></select>
+                </label>
+                <label>
+                    Project
+                    <input name="name" required value="Backend API delivery">
+                </label>
+                <label>
+                    Hourly rate
+                    <input name="hourlyRate" type="number" min="0.01" step="0.01" required value="95">
+                </label>
+                <label>
+                    Currency
+                    <input name="currency" required maxlength="3" value="EUR">
+                </label>
+                <button type="submit">Create project</button>
+            </form>
+        </article>
+
+        <article class="panel">
+            <div class="section-title">
+                <h2>Log time</h2>
+                <span>POST /api/time-entries</span>
+            </div>
+            <form id="timeEntryForm" class="entity-form">
+                <label>
+                    Project
+                    <select name="projectId" required></select>
+                </label>
+                <label>
+                    Work date
+                    <input name="workDate" type="date" required>
+                </label>
+                <label>
+                    Hours
+                    <input name="hours" type="number" min="0.25" max="24" step="0.25" required value="6.5">
+                </label>
+                <label class="full">
+                    Description
+                    <textarea name="description" rows="2" required>Implemented secured invoice workflow and PDF export.</textarea>
+                </label>
+                <button type="submit">Create time entry</button>
+            </form>
+        </article>
+    </section>
+
     <section class="grid">
         <article class="panel">
             <div class="section-title">
