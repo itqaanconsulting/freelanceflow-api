@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
@@ -28,6 +29,14 @@ class SecurityAuthorizationTest {
 
     @Test
     void allowsDemoPageWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/demo/index.html"));
+
+        mockMvc.perform(get("/demo/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/demo/index.html"));
+
         mockMvc.perform(get("/demo/index.html"))
                 .andExpect(status().isOk());
     }

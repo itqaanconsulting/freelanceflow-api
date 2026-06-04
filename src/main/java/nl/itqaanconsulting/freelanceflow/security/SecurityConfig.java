@@ -32,6 +32,8 @@ class SecurityConfig {
                                 "/actuator/health",
                                 "/actuator/info",
                                 "/",
+                                "/demo",
+                                "/demo/",
                                 "/demo/**",
                                 "/favicon.ico",
                                 "/swagger-ui.html",
