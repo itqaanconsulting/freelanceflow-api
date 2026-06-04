@@ -1,78 +1,102 @@
 # FreelanceFlow API
 
-FreelanceFlow API is a Spring Boot backend showcase project for freelance time tracking and invoice workflows.
+FreelanceFlow API is a Spring Boot portfolio project for freelance time tracking, approval workflows and invoice generation.
 
-The project is designed to demonstrate secure REST API development, workflow-oriented domain modelling, database migrations, validation, testability and integration-ready architecture for freelance and consultancy businesses.
+It demonstrates how a Java backend can model a realistic business workflow with secured REST APIs, PostgreSQL persistence, Flyway migrations, Keycloak-based JWT authorization, audit logging, PDF invoice export and automated tests.
 
-## Why this project exists
+## Portfolio Value
 
-This repository is part of Hani El Amam's freelance Java portfolio. It focuses on practical backend engineering skills that are relevant in enterprise and consultancy environments:
+This project is part of Hani El Amam's freelance Java portfolio. It focuses on backend engineering skills that matter in enterprise and consultancy environments:
 
 - Java 21 and Spring Boot backend development
-- REST API design with validation and consistent error responses
+- REST API design with validation and consistent errors
+- Workflow-oriented domain modelling
 - PostgreSQL persistence with JPA/Hibernate
 - Flyway database migrations
+- OAuth2/JWT security with Keycloak
+- Role-based authorization
+- Audit logging for business events
+- PDF generation
 - Docker-based local development
-- OAuth2/JWT API security with Keycloak
-- OpenAPI/Swagger API documentation
-- Testable modular package structure
-- PostgreSQL integration testing with Testcontainers
+- CI with Maven and GitHub Actions
+- Integration testing with Testcontainers
 
-## What this project demonstrates
-
-FreelanceFlow models a realistic freelance administration workflow:
-
-- A customer is registered.
-- A billable project is created for that customer.
-- Work is logged as time entries.
-- Time entries move through an approval workflow.
-- Approved work is converted into an invoice.
-- The invoice can be marked as paid or cancelled.
-
-The main workflow is:
+## Workflow
 
 ```text
-Customer -> Project -> Time Entry -> Approval -> Invoice -> Payment
+Customer -> Project -> Time Entry -> Approval -> Invoice -> Payment -> Audit
 ```
 
-Current capabilities:
+The application supports a complete freelance administration flow:
 
-- Static portfolio demo UI served by Spring Boot
+- Register customers.
+- Create billable projects.
+- Log work as time entries.
+- Submit and approve time entries.
+- Generate invoices from approved, uninvoiced work.
+- Download invoices as PDF.
+- Mark invoices as paid.
+- Inspect audit events for workflow changes.
+
+## Demo UI
+
+A static portfolio demo UI is served by Spring Boot:
+
+```text
+http://localhost:8080/demo/
+```
+
+Recommended demo flow:
+
+1. Login with `admin / admin`.
+2. Click `Reset demo data`.
+3. Load the dashboard.
+4. Review the customer, project, time entries and invoice.
+5. Download the invoice PDF.
+6. Load audit events.
+7. Optionally create extra data through `Manual entry`.
+
+The reset creates a stable demo dataset:
+
+- 1 customer: `Acme Consulting`
+- 1 project: `Backend Modernization`
+- 3 time entries: `DRAFT`, `SUBMITTED`, `APPROVED`
+- 1 issued invoice
+- 7 audit events
+
+## API Capabilities
+
 - Customer CRUD API
 - Project CRUD API linked to customers
-- Project status model: active, paused, completed
 - Time entry CRUD API linked to projects
-- Time entry workflow: draft, submitted, approved, rejected
+- Time entry workflow: `DRAFT`, `SUBMITTED`, `APPROVED`, `REJECTED`
 - Invoice generation from approved time entries
-- PDF export for generated invoices
-- Invoice status model: issued, paid, cancelled
-- Audit logging for time entry and invoice workflow changes
-- OAuth2/JWT security with role-based authorization
-- Request validation
-- Duplicate customer email checks
-- Duplicate project name checks per customer
-- Consistent API error responses
-- PostgreSQL schema migration with Flyway
-- Swagger UI
-- Maven CI pipeline with GitHub Actions
+- Invoice PDF export
+- Invoice workflow: `ISSUED`, `PAID`, `CANCELLED`
+- Audit logging for time entry and invoice events
+- Admin-only demo data reset
+- Swagger/OpenAPI documentation
+- Consistent validation and error responses
 
-## Tech stack
+## Tech Stack
 
 - Java 21
 - Spring Boot 3
 - Spring Web
 - Spring Data JPA
+- Spring Security OAuth2 Resource Server
 - Bean Validation
 - PostgreSQL
 - Keycloak
-- Spring Security OAuth2 Resource Server
 - Flyway
+- OpenPDF
 - Docker Compose
 - Maven
 - JUnit 5
 - Testcontainers
+- GitHub Actions
 
-## Run locally
+## Run Locally
 
 Start PostgreSQL and Keycloak:
 
@@ -80,7 +104,7 @@ Start PostgreSQL and Keycloak:
 docker compose up -d
 ```
 
-The local PostgreSQL container is exposed on host port `5433` to avoid conflicts with existing PostgreSQL installations.
+PostgreSQL is exposed on `localhost:5433`.
 Keycloak is exposed on `http://localhost:8180`.
 
 Run the API:
@@ -89,28 +113,16 @@ Run the API:
 mvn spring-boot:run
 ```
 
-Open Swagger UI:
-
-```text
-http://localhost:8080/swagger-ui.html
-```
-
-Open the portfolio demo UI:
+Open the demo UI:
 
 ```text
 http://localhost:8080/demo/
 ```
 
-Keycloak admin console:
+Open Swagger UI:
 
 ```text
-http://localhost:8180
-```
-
-Admin credentials:
-
-```text
-admin / admin
+http://localhost:8080/swagger-ui.html
 ```
 
 Health endpoint:
@@ -119,27 +131,7 @@ Health endpoint:
 http://localhost:8080/actuator/health
 ```
 
-## Demo scenario
-
-The fastest way to explore the API is through Swagger UI:
-
-```text
-http://localhost:8080/swagger-ui.html
-```
-
-For a visual demo, open:
-
-```text
-http://localhost:8080/demo/
-```
-
-The demo UI can log in with the Keycloak demo users, reset a stable demo dataset, load secured API data, manually create customers, projects and time entries, move time entries through the workflow, generate invoices, download the generated invoice PDF and inspect admin-only audit events.
-
-Login with `admin / admin` and click `Reset demo data` to recreate a clean portfolio walkthrough with one customer, one project, three time entries, one issued invoice and audit history.
-
-Click `Authorize` in Swagger and log in with one of the demo users.
-
-Demo users:
+## Demo Users
 
 | Username | Password | Role |
 | --- | --- | --- |
@@ -147,145 +139,31 @@ Demo users:
 | `accountant` | `accountant` | `ACCOUNTANT` |
 | `admin` | `admin` | `ADMIN` |
 
-Use this scenario to demo the complete workflow.
+## Security Rules
 
-### 1. Create a customer
+- Demo UI, Swagger UI, OpenAPI docs and health/info actuator endpoints are public.
+- Customer, project, time-entry and invoice generation endpoints require `FREELANCER` or `ADMIN`.
+- Invoice payment endpoint requires `ACCOUNTANT` or `ADMIN`.
+- Audit events require `ADMIN`.
+- Demo reset requires `ADMIN`.
+- JWT roles are read from Keycloak `realm_access.roles`.
 
-Endpoint:
+## Main Endpoints
 
-```text
-POST /api/customers
-```
+| Capability | Endpoint |
+| --- | --- |
+| Customers | `GET /api/customers`, `POST /api/customers` |
+| Projects | `GET /api/projects`, `POST /api/projects` |
+| Time entries | `GET /api/time-entries`, `POST /api/time-entries` |
+| Submit time entry | `POST /api/time-entries/{id}/submit` |
+| Approve time entry | `POST /api/time-entries/{id}/approve` |
+| Generate invoice | `POST /api/invoices/generate` |
+| Mark invoice paid | `POST /api/invoices/{id}/mark-paid` |
+| Download invoice PDF | `GET /api/invoices/{id}/pdf` |
+| Audit events | `GET /api/audit-events` |
+| Demo reset | `POST /api/demo/reset` |
 
-```bash
-curl -X POST http://localhost:8080/api/customers \
-  -H "Content-Type: application/json" \
-  -d '{
-    "companyName": "Acme Consulting",
-    "contactName": "Jane Doe",
-    "email": "jane@example.com",
-    "phone": "+31 20 123 4567",
-    "vatNumber": "NL123456789B01",
-    "street": "Keizersgracht 1",
-    "city": "Amsterdam",
-    "country": "Netherlands"
-  }'
-```
-
-Copy the returned `id`. This is the `customerId` for the next step.
-
-### 2. Create a project
-
-Endpoint:
-
-```text
-POST /api/projects
-```
-
-```bash
-curl -X POST http://localhost:8080/api/projects \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customerId": "<customer-id>",
-    "name": "Backend modernization",
-    "description": "Spring Boot API modernization and integration improvements",
-    "hourlyRate": 95.00,
-    "currency": "EUR",
-    "status": "ACTIVE",
-    "startDate": "2026-06-01"
-  }'
-```
-
-Copy the returned `id`. This is the `projectId` for the next step.
-
-### 3. Create a time entry
-
-Endpoint:
-
-```text
-POST /api/time-entries
-```
-
-```bash
-curl -X POST http://localhost:8080/api/time-entries \
-  -H "Content-Type: application/json" \
-  -d '{
-    "projectId": "<project-id>",
-    "workDate": "2026-06-03",
-    "hours": 7.50,
-    "description": "Implemented customer and project API workflow"
-  }'
-```
-
-The time entry starts with status `DRAFT`. Copy the returned `id`.
-
-### 4. Submit and approve the time entry
-
-Endpoints:
-
-```text
-POST /api/time-entries/{id}/submit
-POST /api/time-entries/{id}/approve
-```
-
-```bash
-curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/submit
-curl -X POST http://localhost:8080/api/time-entries/<time-entry-id>/approve
-```
-
-After approval, the time entry has status `APPROVED` and can be invoiced.
-
-### 5. Generate an invoice
-
-Endpoint:
-
-```text
-POST /api/invoices/generate
-```
-
-```bash
-curl -X POST http://localhost:8080/api/invoices/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "projectId": "<project-id>",
-    "issueDate": "2026-06-03",
-    "dueDate": "2026-06-17"
-  }'
-```
-
-The invoice contains one line per approved, uninvoiced time entry. Copy the returned `id`.
-
-### 6. Mark the invoice as paid
-
-Endpoint:
-
-```text
-POST /api/invoices/{id}/mark-paid
-```
-
-```bash
-curl -X POST http://localhost:8080/api/invoices/<invoice-id>/mark-paid
-```
-
-The invoice now has status `PAID`.
-
-### 7. Download the invoice PDF
-
-Endpoint:
-
-```text
-GET /api/invoices/{id}/pdf
-```
-
-```bash
-curl -L http://localhost:8080/api/invoices/<invoice-id>/pdf \
-  -H "Authorization: Bearer <access-token>" \
-  -o invoice.pdf
-```
-
-The response is an `application/pdf` document containing the invoice number, customer, project, line items and total.
-
-## API workflow rules
+## Workflow Rules
 
 - Only `DRAFT` time entries can be updated or deleted.
 - Only `DRAFT` time entries can be submitted.
@@ -294,25 +172,8 @@ The response is an `application/pdf` document containing the invoice number, cus
 - A time entry can only be invoiced once.
 - Invoice generation fails when a project has no approved, uninvoiced time entries.
 - Only `ISSUED` invoices can be marked as paid or cancelled.
-- Invoice PDFs can be downloaded after invoice generation.
 
-## Security rules
-
-- The static demo UI, Swagger UI, OpenAPI docs and health/info actuator endpoints are public.
-- Customer, project, time-entry and invoice generation endpoints require `FREELANCER` or `ADMIN`.
-- Invoice payment endpoint requires `ACCOUNTANT` or `ADMIN`.
-- Audit events require `ADMIN`.
-- JWT roles are read from Keycloak `realm_access.roles`.
-
-## Audit logging
-
-Workflow changes are recorded as audit events and can be inspected through:
-
-```text
-GET /api/audit-events
-GET /api/audit-events?aggregateType=TIME_ENTRY&aggregateId=<time-entry-id>
-GET /api/audit-events?aggregateType=INVOICE&aggregateId=<invoice-id>
-```
+## Audit Events
 
 Recorded events include:
 
@@ -324,24 +185,36 @@ Recorded events include:
 - `INVOICE_PAID`
 - `INVOICE_CANCELLED`
 
-## Continuous integration
+Audit events can be queried globally or by aggregate:
 
-GitHub Actions runs two test jobs on pushes and pull requests to `main`:
+```text
+GET /api/audit-events
+GET /api/audit-events?aggregateType=TIME_ENTRY&aggregateId=<time-entry-id>
+GET /api/audit-events?aggregateType=INVOICE&aggregateId=<invoice-id>
+```
+
+## Testing
+
+Run the default test suite:
+
+```bash
+mvn test
+```
+
+Run PostgreSQL integration tests with Testcontainers:
+
+```bash
+mvn verify -Ppostgres-it
+```
+
+GitHub Actions runs:
 
 ```bash
 mvn test
 mvn verify -Ppostgres-it
 ```
 
-The default test suite uses an in-memory test database for fast feedback. The `postgres-it` profile runs a full workflow against a real PostgreSQL container with Testcontainers.
+## Notes
 
-To run the PostgreSQL integration test locally, make sure Docker is running and execute:
+This is a portfolio project, not a production SaaS. The demo reset endpoint intentionally recreates local demo data and is restricted to `ADMIN`.
 
-```bash
-mvn verify -Ppostgres-it
-```
-
-## Roadmap
-
-- Integration events for invoice lifecycle changes
-- Frontend demo application
