@@ -10,7 +10,6 @@ import nl.itqaanconsulting.freelanceflow.timeentry.TimeEntryStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +20,12 @@ class InvoiceService {
     private final ProjectRepository projectRepository;
     private final TimeEntryRepository timeEntryRepository;
     private final AuditService auditService;
+    private final InvoiceNumberGenerator invoiceNumberGenerator;
 
     InvoiceService(InvoiceRepository invoiceRepository, ProjectRepository projectRepository,
-                   TimeEntryRepository timeEntryRepository, AuditService auditService) {
+                   TimeEntryRepository timeEntryRepository, AuditService auditService,
+                   InvoiceNumberGenerator invoiceNumberGenerator) {
+        this.invoiceNumberGenerator = invoiceNumberGenerator;
         this.invoiceRepository = invoiceRepository;
         this.projectRepository = projectRepository;
         this.timeEntryRepository = timeEntryRepository;
@@ -66,7 +68,7 @@ class InvoiceService {
 
         Invoice invoice = invoiceRepository.save(new Invoice(
                 project,
-                nextInvoiceNumber(request.issueDate()),
+                invoiceNumberGenerator.next(request.issueDate()),
                 request.issueDate(),
                 request.dueDate()
         ));
@@ -105,12 +107,5 @@ class InvoiceService {
     private Invoice findInvoice(UUID id) {
         return invoiceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found: " + id));
-    }
-
-    private String nextInvoiceNumber(LocalDate issueDate) {
-        LocalDate firstDayOfYear = LocalDate.of(issueDate.getYear(), 1, 1);
-        LocalDate lastDayOfYear = LocalDate.of(issueDate.getYear(), 12, 31);
-        long nextSequence = invoiceRepository.countByIssueDateBetween(firstDayOfYear, lastDayOfYear) + 1;
-        return "INV-%d-%04d".formatted(issueDate.getYear(), nextSequence);
     }
 }

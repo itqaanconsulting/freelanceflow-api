@@ -82,4 +82,31 @@ class SecurityAuthorizationTest {
         mockMvc.perform(post("/api/invoices/00000000-0000-0000-0000-000000000000/mark-paid"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @WithMockUser(roles = "FREELANCER")
+    void rejectsFreelancerFromApprovingOrRejectingTimeEntries() throws Exception {
+        mockMvc.perform(post("/api/time-entries/00000000-0000-0000-0000-000000000000/approve"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/time-entries/00000000-0000-0000-0000-000000000000/reject"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ACCOUNTANT")
+    void allowsAccountantToReviewAndApproveTimeEntries() throws Exception {
+        mockMvc.perform(get("/api/time-entries"))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/time-entries/00000000-0000-0000-0000-000000000000/approve"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "ACCOUNTANT")
+    void rejectsAccountantFromRegisteringTimeEntries() throws Exception {
+        mockMvc.perform(post("/api/time-entries")
+                        .contentType("application/json")
+                        .content("{}"))
+                .andExpect(status().isForbidden());
+    }
 }

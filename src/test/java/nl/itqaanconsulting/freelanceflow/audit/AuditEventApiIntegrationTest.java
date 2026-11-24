@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -46,6 +47,20 @@ class AuditEventApiIntegrationTest {
                 .andExpect(jsonPath("$[*].eventType", hasItem("TIME_ENTRY_CREATED")))
                 .andExpect(jsonPath("$[*].eventType", hasItem("TIME_ENTRY_SUBMITTED")))
                 .andExpect(jsonPath("$[*].eventType", hasItem("TIME_ENTRY_APPROVED")));
+    }
+
+    @Test
+    @WithMockUser(username = "anna.accountant", roles = "ADMIN")
+    void recordsAuthenticatedUserAsAuditActor() throws Exception {
+        UUID projectId = createProject();
+        UUID timeEntryId = createTimeEntry(projectId);
+
+        mockMvc.perform(get("/api/audit-events")
+                        .param("aggregateType", "TIME_ENTRY")
+                        .param("aggregateId", timeEntryId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].eventType").value("TIME_ENTRY_CREATED"))
+                .andExpect(jsonPath("$[0].actor").value("anna.accountant"));
     }
 
     private UUID createTimeEntry(UUID projectId) throws Exception {
