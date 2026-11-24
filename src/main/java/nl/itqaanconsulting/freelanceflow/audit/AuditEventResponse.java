@@ -9,6 +9,7 @@ public record AuditEventResponse(
         UUID aggregateId,
         String eventType,
         String message,
+        String actor,
         OffsetDateTime createdAt
 ) {
     static AuditEventResponse from(AuditEvent event) {
@@ -18,6 +19,7 @@ public record AuditEventResponse(
                 event.getAggregateId(),
                 event.getEventType(),
                 event.getMessage(),
+                event.getActor(),
                 event.getCreatedAt()
         );
     }

@@ -28,14 +28,18 @@ public class AuditEvent {
     @Column(nullable = false, length = 1000)
     private String message;
 
+    @Column(nullable = false, length = 100)
+    private String actor;
+
     @Column(nullable = false)
     private OffsetDateTime createdAt;
 
     protected AuditEvent() {
     }
 
-    public AuditEvent(String aggregateType, UUID aggregateId, String eventType, String message) {
+    public AuditEvent(String aggregateType, UUID aggregateId, String eventType, String message, String actor) {
         this.id = UUID.randomUUID();
+        this.actor = actor;
         this.aggregateType = aggregateType;
         this.aggregateId = aggregateId;
         this.eventType = eventType;
@@ -65,6 +69,10 @@ public class AuditEvent {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getActor() {
+        return actor;
     }
 
     public OffsetDateTime getCreatedAt() {

@@ -3,6 +3,7 @@ package nl.itqaanconsulting.freelanceflow.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -44,6 +45,11 @@ class SecurityConfig {
                         .requestMatchers("/api/audit-events/**").hasRole("ADMIN")
                         .requestMatchers("/api/invoices/*/mark-paid").hasAnyRole("ACCOUNTANT", "ADMIN")
                         .requestMatchers("/api/invoices/**").hasAnyRole("FREELANCER", "ACCOUNTANT", "ADMIN")
+                        // Segregation of duties: freelancers register hours, they cannot approve them.
+                        .requestMatchers(HttpMethod.POST, "/api/time-entries/*/approve", "/api/time-entries/*/reject")
+                            .hasAnyRole("ACCOUNTANT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/time-entries", "/api/time-entries/**")
+                            .hasAnyRole("FREELANCER", "ACCOUNTANT", "ADMIN")
                         .requestMatchers("/api/**").hasAnyRole("FREELANCER", "ADMIN")
                         .anyRequest().authenticated()
                 )

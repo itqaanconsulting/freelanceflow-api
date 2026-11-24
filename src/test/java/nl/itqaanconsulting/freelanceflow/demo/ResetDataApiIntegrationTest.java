@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "UPDATE time_entries SET invoice_id = NULL",
                 "DELETE FROM audit_events",
                 "DELETE FROM invoices",
+                "DELETE FROM invoice_number_counters",
                 "DELETE FROM time_entries",
                 "DELETE FROM projects",
                 "DELETE FROM customers"

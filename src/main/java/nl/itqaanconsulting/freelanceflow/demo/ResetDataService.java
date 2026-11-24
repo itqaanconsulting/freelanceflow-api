@@ -118,6 +118,7 @@ class ResetDataService {
         jdbcTemplate.update("UPDATE time_entries SET invoice_id = NULL");
         jdbcTemplate.update("DELETE FROM audit_events");
         jdbcTemplate.update("DELETE FROM invoices");
+        jdbcTemplate.update("DELETE FROM invoice_number_counters");
         jdbcTemplate.update("DELETE FROM time_entries");
         jdbcTemplate.update("DELETE FROM projects");
         jdbcTemplate.update("DELETE FROM customers");

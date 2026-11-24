@@ -15,7 +15,8 @@ The codebase focuses on backend engineering topics that are common in enterprise
 - Flyway database migrations
 - OAuth2/JWT security with Keycloak
 - Role-based authorization
-- Audit logging for business events
+- Audit logging for business events, including the acting user
+- Unique, gap-free invoice numbers per year, safe under concurrent requests
 - PDF generation
 - Docker-based local development
 - CI with Maven and GitHub Actions
@@ -143,6 +144,7 @@ http://localhost:8080/actuator/health
 
 - Demo UI, Swagger UI, OpenAPI docs and health/info actuator endpoints are public.
 - Customer, project, time-entry and invoice generation endpoints require `FREELANCER` or `ADMIN`.
+- Approving or rejecting time entries requires `ACCOUNTANT` or `ADMIN`: a freelancer cannot approve their own hours (segregation of duties). Accountants can also read time entries to review them.
 - Invoice payment endpoint requires `ACCOUNTANT` or `ADMIN`.
 - Audit events require `ADMIN`.
 - Demo reset requires `ADMIN`.
@@ -173,6 +175,10 @@ http://localhost:8080/actuator/health
 - Invoice generation fails when a project has no approved, uninvoiced time entries.
 - Only `ISSUED` invoices can be marked as paid or cancelled.
 
+## Invoice Numbering
+
+Invoice numbers follow `INV-<year>-<sequence>`. The last sequence per year is kept in `invoice_number_counters`; its row is locked with `SELECT ... FOR UPDATE` while a number is drawn and stays locked until the invoice is committed. Concurrent requests therefore never receive the same number, and a rolled-back invoice does not leave a gap.
+
 ## Audit Events
 
 Recorded events include:
@@ -184,6 +190,8 @@ Recorded events include:
 - `INVOICE_GENERATED`
 - `INVOICE_PAID`
 - `INVOICE_CANCELLED`
+
+Every audit event records the acting user (`actor`), taken from the Keycloak `preferred_username` claim. Events created outside a user request are recorded as `system`.
 
 Audit events can be queried globally or by aggregate:
 
