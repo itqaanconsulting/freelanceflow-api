@@ -1,10 +1,10 @@
 package nl.itqaanconsulting.freelanceflow.invoice;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -61,7 +61,7 @@ class InvoiceApiIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        UUID invoiceId = UUID.fromString(objectMapper.readTree(response).get("id").asText());
+        UUID invoiceId = UUID.fromString(objectMapper.readTree(response).get("id").asString());
 
         byte[] pdf = mockMvc.perform(get("/api/invoices/{id}/pdf", invoiceId))
                 .andExpect(status().isOk())
@@ -123,7 +123,7 @@ class InvoiceApiIntegrationTest {
                 .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
-        return UUID.fromString(json.get("id").asText());
+        return UUID.fromString(json.get("id").asString());
     }
 
     private UUID createProject() throws Exception {
@@ -147,7 +147,7 @@ class InvoiceApiIntegrationTest {
                 .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
-        return UUID.fromString(json.get("id").asText());
+        return UUID.fromString(json.get("id").asString());
     }
 
     private UUID createCustomer() throws Exception {
@@ -171,6 +171,6 @@ class InvoiceApiIntegrationTest {
                 .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
-        return UUID.fromString(json.get("id").asText());
+        return UUID.fromString(json.get("id").asString());
     }
 }
