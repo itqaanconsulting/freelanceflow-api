@@ -1,10 +1,10 @@
 package nl.itqaanconsulting.freelanceflow;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -78,7 +78,7 @@ class PostgresWorkflowIT {
                 .getResponse()
                 .getContentAsString();
 
-        UUID invoiceId = UUID.fromString(objectMapper.readTree(invoiceResponse).get("id").asText());
+        UUID invoiceId = UUID.fromString(objectMapper.readTree(invoiceResponse).get("id").asString());
 
         mockMvc.perform(post("/api/invoices/{id}/mark-paid", invoiceId))
                 .andExpect(status().isOk())
@@ -113,7 +113,7 @@ class PostgresWorkflowIT {
                 .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
-        return UUID.fromString(json.get("id").asText());
+        return UUID.fromString(json.get("id").asString());
     }
 
     private UUID createProject(UUID customerId) throws Exception {
@@ -136,7 +136,7 @@ class PostgresWorkflowIT {
                 .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
-        return UUID.fromString(json.get("id").asText());
+        return UUID.fromString(json.get("id").asString());
     }
 
     private UUID createTimeEntry(UUID projectId) throws Exception {
@@ -156,6 +156,6 @@ class PostgresWorkflowIT {
                 .getContentAsString();
 
         JsonNode json = objectMapper.readTree(response);
-        return UUID.fromString(json.get("id").asText());
+        return UUID.fromString(json.get("id").asString());
     }
 }
