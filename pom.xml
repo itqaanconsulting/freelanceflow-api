@@ -18,6 +18,12 @@
     <description>Spring Boot backend showcase for freelance time tracking and invoicing workflows.</description>
 
     <properties>
+
+        <!-- Tomcat 11.0.29 fixes CVE-2026-116561 and CVE-2026-118028 (critical) and several high ones;
+
+             remove this override once Spring Boot manages 11.0.29 or later. -->
+
+        <tomcat.version>11.0.29</tomcat.version>
         <java.version>21</java.version>
         <springdoc.version>3.2.1</springdoc.version>
         <testcontainers.version>2.0.5</testcontainers.version>
